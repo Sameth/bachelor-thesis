@@ -1,0 +1,10 @@
+\select@language {slovak}
+\contentsline {chapter}{\IeC {\'U}vod}{1}
+\contentsline {chapter}{\numberline {1}Z\IeC {\'a}kladn\IeC {\'e} pojmy, motiv\IeC {\'a}cia a s\IeC {\'u}visiace pr\IeC {\'a}ce}{2}
+\contentsline {chapter}{\numberline {2}Po\IeC {\v z}iadavky na rie\IeC {\v s}enie}{3}
+\contentsline {section}{\numberline {2.1}H\IeC {\v l}adanie $k$-nadslova}{3}
+\contentsline {subsection}{\numberline {2.1.1}$\mathcal {NP}$-\IeC {\v t}a\IeC {\v z}kos\IeC {\v t} probl\IeC {\'e}mu}{4}
+\contentsline {subsection}{\numberline {2.1.2}Abstrakcia}{4}
+\contentsline {subsection}{\numberline {2.1.3}Vlastnosti abstrakcie}{7}
+\contentsline {chapter}{\numberline {3}V\IeC {\'y}sledky a porovnanie}{8}
+\contentsline {chapter}{Z\IeC {\'a}ver}{9}

@@ -1,0 +1,18 @@
+\newcommand{\noopsort}[1]{} \newcommand{\printfirst}[2]{#1}
+  \newcommand{\singleletter}[1]{#1} \newcommand{\switchargs}[2]{#2#1}
+\begin{thebibliography}{1}
+
+\bibitem{bovza2015fishing}
+Vladim{\'\i}r Bo{\v{z}}a, Jakub Jursa, Bro{\v{n}}a Brejov{\'a}, and
+  Tom{\'a}{\v{s}} Vina{\v{r}}.
+\newblock Fishing in read collections: Memory efficient indexing for sequence
+  assembly.
+\newblock In {\em String Processing and Information Retrieval}, pages 188--198.
+  Springer, 2015.
+
+\bibitem{superstring}
+John Gallant, David Maier, and James Astorer.
+\newblock On finding minimal length superstrings.
+\newblock {\em Journal of Computer and System Sciences}, 20(1):50--58, 1980.
+
+\end{thebibliography}
