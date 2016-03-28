@@ -1,14 +1,15 @@
 #include <bits/stdc++.h>
+#include "common.h"
 
 using namespace std;
 
 typedef unsigned long long int_t;
 
-map<char, int_t> base_to_int = {'A':0, 'C':1, 'G':2, 'T':3};
+map<char, int_t> base_to_int = {{'A',0}, {'C',1}, {'G',2}, {'T',3}};
 
 vector <int_t> encode (string& s, int k) {
     vector <int_t> result;
-    if (s.size() < k) return result;
+    if ((int) s.size() < k) return result;
     int_t roll = 0;
     for (int i = 0; i < k - 1; i++) {
         roll <<= 2;
@@ -24,4 +25,5 @@ vector <int_t> encode (string& s, int k) {
 }
 
 int main () {
+
 }
