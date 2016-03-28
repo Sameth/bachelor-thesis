@@ -1,3 +1,6 @@
+#ifndef GRAPH_H
+#define GRAPH_H
+
 #include <vector>
 #include <map>
 #include "common.h"
@@ -12,3 +15,5 @@ class Graph {
     public:
         void add_edge(int_t, int_t);
 };
+
+#endif //GRAPH_H
