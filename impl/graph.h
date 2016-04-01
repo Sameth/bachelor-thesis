@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 #include "common.h"
 
 using namespace std;
@@ -10,8 +11,10 @@ using namespace std;
 class Graph {
     map <int_t, int_t> label_compress;
     vector <int_t> label_decompress;
-    vector <vector <int_t> > edges;
+    vector <set <int_t> > edges;
+    vector <vector <int_t> > edges_for_euler;
     int number_of_vertices = 0;
+    void construct_edges_for_euler();
     public:
         void add_edge(int_t, int_t);
 };
