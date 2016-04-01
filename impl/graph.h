@@ -11,7 +11,7 @@ class Graph {
     map <int_t, int_t> label_compress;
     vector <int_t> label_decompress;
     vector <vector <int_t> > edges;
-    static int number_of_vertices = 0;
+    int number_of_vertices = 0;
     public:
         void add_edge(int_t, int_t);
 };
