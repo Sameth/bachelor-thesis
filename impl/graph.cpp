@@ -52,6 +52,10 @@ int_t Graph::count_distance(int_t v1, int_t v2) {
     assert(false);
 }
 
+/**
+ * Count the price of adding edges from first "false" vertex to
+ * first "true", second to second, etc. etc.
+ */
 int_t Graph::count_score(vector <pair <int_t, bool> >& assignment) {
     int_t score = 0;
     unsigned int false_ = 0, true_ = 0;
@@ -65,6 +69,10 @@ int_t Graph::count_score(vector <pair <int_t, bool> >& assignment) {
     return score;
 }
 
+/**
+ * Tries RETRIES random assignments and picks the best one.
+ * Adds picked edges to the graph, to make it eulerian.
+ */
 void Graph::random_assignment(vector <pair <int_t, bool> >& bad_vertices) {
     vector <pair <int_t, bool> > best = bad_vertices;
     int_t score = this -> count_score (best);
