@@ -24,9 +24,9 @@ vector <int_t> encode (string& s, int k) {
 }
 
 int main () {
-    Graph g;
     int n, k;
     scanf("%d %d", &n, &k);
+    Graph g(k);
     vector <string> seq(n);
     for (int i = 0; i < n; i++) {
         cin >> seq[i];
