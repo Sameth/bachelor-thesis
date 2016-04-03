@@ -5,6 +5,7 @@
 using namespace std;
 
 map<char, int_t> base_to_int = {{'A',0}, {'C',1}, {'G',2}, {'T',3}};
+map<int_t, char> int_to_base = {{0,'A'}, {1,'C'}, {2,'G'}, {3,'T'}};
 
 vector <int_t> encode (string& s, int k) {
     vector <int_t> result;
@@ -14,11 +15,46 @@ vector <int_t> encode (string& s, int k) {
         roll <<= 2;
         roll += base_to_int [s [i]];
     }
-    for (int i = k; i < (int) s.size(); i++) {
+    for (int i = k - 1; i < (int) s.size(); i++) {
         roll <<= 2;
         roll += base_to_int [s [i]];
         roll &= (1 << (2*k)) - 1;
         result.push_back(roll);
+    }
+    return result;
+}
+
+string decode_two(int_t v1, int_t v2, int k) {
+    int_t cv1 = v1, cv2 = v2;
+    int add = 0, scope = (1 << (2*k - 2)) - 1;
+    while (cv1 != cv2) {
+        add ++;
+        cv2 >>= 2;
+        scope >>= 2;
+        cv1 &= scope;
+    }
+
+    cv2 = v2;
+    string result;
+    for (int i = 0; i < add; i++) {
+        result.push_back (int_to_base [cv2 & 3]);
+        cv2 >>= 2;
+    }
+    reverse(result.begin(), result.end());
+    return result;
+}
+
+string decode(vector <int_t> superstring, int k) {
+    string result;
+    int_t label1 = superstring [0], label2;
+    for (int i = 0; i < k - 1; i++) {
+        result.push_back(int_to_base [label1 & 3]);
+        label1 >>= 2;
+    }
+    reverse(result.begin(), result.end());
+
+    for (int i = 0; i < (int) superstring.size() - 1; i++) {
+        result += decode_two(superstring [i], superstring [i+1], k);
     }
     return result;
 }
@@ -35,4 +71,7 @@ int main () {
             g.add_edge(encoded [j], encoded [j + 1]);
         }
     }
+
+    vector <int_t> result_ints = g.euler_path();
+    cout << decode(result_ints, k) << endl;;
 }

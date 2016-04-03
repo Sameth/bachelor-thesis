@@ -19,9 +19,11 @@ class Graph {
     void random_assignment(vector <pair <int_t, bool> >&);
     int_t count_distance(int_t, int_t);
     int_t count_score(vector <pair <int_t, bool> >&);
+    void euler_recursive(int_t, vector <int_t>&);
     public:
         void add_edge(int_t, int_t);
         Graph(int kk): k(kk){}
+        vector <int_t> euler_path();
 };
 
 #endif //GRAPH_H

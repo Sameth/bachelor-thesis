@@ -3,6 +3,7 @@
 #include <ctime>
 #include <unistd.h>
 #include <cassert>
+#include <iostream>
 
 #ifndef RETRIES
 #define RETRIES 1000
@@ -13,6 +14,14 @@
 #endif
 
 using namespace std;
+
+bool is_true(pair<int_t, bool> e) {
+    return e.second;
+}
+
+bool is_false(pair<int_t, bool> e) {
+    return !e.second;
+}
 
 void Graph::add_edge(int_t from, int_t to) {
     if (label_compress.count(from) == 0) {
@@ -27,7 +36,7 @@ void Graph::add_edge(int_t from, int_t to) {
 
         // Add vertex
         label_compress [to] = number_of_vertices;
-        label_decompress.push_back(from);
+        label_decompress.push_back(to);
         edges.push_back(set <int_t>());
         number_of_vertices ++;
     }
@@ -59,11 +68,14 @@ int_t Graph::count_distance(int_t v1, int_t v2) {
 int_t Graph::count_score(vector <pair <int_t, bool> >& assignment) {
     int_t score = 0;
     unsigned int false_ = 0, true_ = 0;
+//    if (count_if(assignment.begin(), assignment.end(), is_true) != count_if(assignment.begin(), assignment.end(), is_false)) cout << "WAT!\n";
     while (false_ < assignment.size()) {
         while (false_ < assignment.size() && assignment [false_].second) false_ ++;
         while (true_ < assignment.size() && !assignment [true_].second) true_ ++;
         if (false_ < assignment.size()) {
             score += this -> count_distance (assignment [false_].first, assignment [true_].first);
+            false_ ++;
+            true_ ++;
         }
     }
     return score;
@@ -74,6 +86,7 @@ int_t Graph::count_score(vector <pair <int_t, bool> >& assignment) {
  * Adds picked edges to the graph, to make it eulerian.
  */
 void Graph::random_assignment(vector <pair <int_t, bool> >& bad_vertices) {
+    if (bad_vertices.empty()) return;
     vector <pair <int_t, bool> > best = bad_vertices;
     int_t score = this -> count_score (best);
     srand (time(NULL) + getpid());
@@ -93,6 +106,8 @@ void Graph::random_assignment(vector <pair <int_t, bool> >& bad_vertices) {
         while (true_ < best.size() && !best [true_].second) true_ ++;
         if (false_ < best.size()) {
             this -> edges_for_euler [best [false_].first].push_back(best [true_].first);
+            false_ ++;
+            true_ ++;
         }
     }
 }
@@ -100,6 +115,7 @@ void Graph::random_assignment(vector <pair <int_t, bool> >& bad_vertices) {
 void Graph::construct_edges_for_euler() {
 
     // First, collapse set into a vector (we might need duplicates).
+    this -> edges_for_euler.clear();
     this -> edges_for_euler.resize(number_of_vertices);
     for (int i = 0; i < number_of_vertices; i++) {
         for (int_t v : edges [i]) {
@@ -127,11 +143,42 @@ void Graph::construct_edges_for_euler() {
         }
         else {
             for (int j = degreecount [i]; j < 0; j++) {
-                bad_vertices.push_back(make_pair(j, false));
+                bad_vertices.push_back(make_pair(i, false));
             }
         }
     }
-    
+  
     // Add edges so that the graph is eulerian.
     this->random_assignment(bad_vertices);
 }
+
+void Graph::euler_recursive(int_t v, vector <int_t>& result) {
+    while (!edges_for_euler[v].empty()) {
+        int next = edges_for_euler [v].back();
+        edges_for_euler[v].pop_back();
+        euler_recursive(next, result);
+    }
+    result.push_back(v);
+}
+
+vector <int_t> Graph::euler_path() {
+    this -> construct_edges_for_euler();
+
+/*    for (int i = 0; i < number_of_vertices; i++) {
+        printf("%d:", i);
+        for (int j = 0; j < edges_for_euler [i].size(); j ++) {
+            printf (" %d", edges_for_euler [i] [j]);
+        }
+        printf("\n");
+    }
+*/
+    vector <int_t> result;
+    euler_recursive(0, result);
+    reverse(result.begin(), result.end());
+    vector <int_t> decompressed_result;
+    for (int_t v : result) {
+        decompressed_result.push_back(label_decompress [v]);
+    }
+    return decompressed_result;
+}
+
