@@ -26,7 +26,9 @@ vector <int_t> encode (string& s, int k) {
 
 string decode_two(int_t v1, int_t v2, int k) {
     int_t cv1 = v1, cv2 = v2;
-    int add = 0, scope = (1 << (2*k - 2)) - 1;
+    int add = 1, scope = (1 << (2*k - 4)) - 1;
+    cv1 &= scope;
+    cv2 >>= 2;
     while (cv1 != cv2) {
         add ++;
         cv2 >>= 2;
@@ -73,5 +75,9 @@ int main () {
     }
 
     vector <int_t> result_ints = g.euler_path();
+    for (int i = 0; i < result_ints.size(); i++) {
+        cout << result_ints [i] << ' ';
+    }
+    cout << endl;
     cout << decode(result_ints, k) << endl;;
 }

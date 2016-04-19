@@ -29,7 +29,7 @@ void Graph::add_edge(int_t from, int_t to) {
         // Add vertex
         label_compress [from] = number_of_vertices;
         label_decompress.push_back(from);
-        edges.push_back(set <int_t>());
+        edges.push_back(map <int_t, int>());
         number_of_vertices ++;
     }
     if (label_compress.count(to) == 0) {
@@ -37,12 +37,12 @@ void Graph::add_edge(int_t from, int_t to) {
         // Add vertex
         label_compress [to] = number_of_vertices;
         label_decompress.push_back(to);
-        edges.push_back(set <int_t>());
+        edges.push_back(map <int_t, int>());
         number_of_vertices ++;
     }
 
     // Add edge
-    edges [label_compress [from]].insert(label_compress [to]);
+    edges [label_compress [from]] [label_compress [to]] ++;
 }
 
 /**
@@ -50,9 +50,11 @@ void Graph::add_edge(int_t from, int_t to) {
  */
 int_t Graph::count_distance(int_t v1, int_t v2) {
     int_t label1 = label_decompress [v1], label2 = label_decompress [v2];
-    int_t scope = (1 << (2*k - 2)) - 1;
+    int_t scope = (1 << (2*k - 4)) - 1;
+    label1 &= scope;
+    label2 >>= 2;
 
-    for (int i = 0; i < k+3; i++) {
+    for (int i = 1; i < k+3; i++) {
         if (label1 == label2) return i;
         scope >>= 2;
         label1 &= scope;
@@ -112,16 +114,56 @@ void Graph::random_assignment(vector <pair <int_t, bool> >& bad_vertices) {
     }
 }
 
+void Graph::search(int_t v, vector <bool>& visited, vector <pair <int_t, bool> >& unsatisfied) {
+    visited [v] = true;
+    if (edges_for_euler [v].size() != reverse_edges [v].size()) unsatisfied.push_back(make_pair(v, edges_for_euler [v].size() > reverse_edges [v].size()));
+    for (int_t new_v : edges_for_euler [v]) {
+        if (!visited [new_v]) {
+            search(new_v, visited, unsatisfied);
+        }
+    }
+    for (int_t new_v : reverse_edges [v]) {
+        if (!visited [new_v]) {
+            search(new_v, visited, unsatisfied);
+        }
+    }
+}
+
+// TODO: Do something more intelligent (like: match vertex with outdegree > indegree
+// with a vertex with outdegree < indegree if possible)
+void Graph::connect_components() {
+    vector <pair <int_t, bool> > unsatisfied_vertices;
+    vector <int_t> all_vertices;
+    vector <bool> visited(number_of_vertices, false);
+    srand (time(NULL) + getpid());
+    search(0, visited, unsatisfied_vertices);
+    int_t last_begin = 0;
+    for (int_t i = 1; i < number_of_vertices; i++) {
+        if (!visited [i]) {
+            vector <pair <int_t, bool> > new_unsatisfied_vertices;
+            search(i, visited, new_unsatisfied_vertices);
+            edges_for_euler [last_begin].push_back(i);
+            reverse_edges [i].push_back(last_begin);
+            last_begin = i;
+        }
+    }
+}
+
 void Graph::construct_edges_for_euler() {
 
     // First, collapse set into a vector (we might need duplicates).
     this -> edges_for_euler.clear();
     this -> edges_for_euler.resize(number_of_vertices);
+    this -> reverse_edges.resize(number_of_vertices);
     for (int i = 0; i < number_of_vertices; i++) {
-        for (int_t v : edges [i]) {
-            this -> edges_for_euler[i].push_back(v);
+        for (auto v : edges [i]) {
+            this -> edges_for_euler[i].push_back(v.first);
+            this -> reverse_edges [v.first].push_back(i);
         }
     }
+
+    // Connect all the components (in unoriented sense)
+    this -> connect_components();
 
     // Next, count bad vertices (outdegree != indegree);
     // second value is true iff outdegree > indegree
