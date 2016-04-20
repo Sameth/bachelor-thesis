@@ -1,8 +1,10 @@
 #include <bits/stdc++.h>
 #include "common.h"
 #include "graph.h"
+#include <sdsl/suffix_arrays.hpp>
 
 using namespace std;
+using namespace sdsl;
 
 map<char, int_t> base_to_int = {{'A',0}, {'C',1}, {'G',2}, {'T',3}};
 map<int_t, char> int_to_base = {{0,'A'}, {1,'C'}, {2,'G'}, {3,'T'}};
@@ -75,9 +77,15 @@ int main () {
     }
 
     vector <int_t> result_ints = g.euler_path();
-    for (int i = 0; i < result_ints.size(); i++) {
+/*    for (int i = 0; i < result_ints.size(); i++) {
         cout << result_ints [i] << ' ';
     }
     cout << endl;
-    cout << decode(result_ints, k) << endl;;
+    cout << decode(result_ints, k) << endl; */
+    string result = decode(result_ints, k);
+    
+    csa_wt<> fm_index;
+    construct_im(fm_index, result, 1);
+
+            
 }
