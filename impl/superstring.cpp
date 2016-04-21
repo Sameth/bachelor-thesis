@@ -48,7 +48,7 @@ string decode_two(int_t v1, int_t v2, int k) {
     return result;
 }
 
-string decode(vector <int_t> superstring, int k) {
+string decode(vector <int_t> superstring, int k, vector <int> path_counts, vector <int>& string_counts) {
     string result;
     int_t label1 = superstring [0], label2;
     for (int i = 0; i < k - 1; i++) {
@@ -77,12 +77,14 @@ int main () {
     }
 
     vector <int_t> result_ints = g.euler_path();
+    vector <int> result_counts = g.path_counts();
 /*    for (int i = 0; i < result_ints.size(); i++) {
         cout << result_ints [i] << ' ';
     }
     cout << endl;
     cout << decode(result_ints, k) << endl; */
     string result = decode(result_ints, k);
+    cout << result << endl;
     
     csa_wt<> fm_index;
     construct_im(fm_index, result, 1);

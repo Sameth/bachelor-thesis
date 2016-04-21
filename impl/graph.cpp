@@ -107,19 +107,22 @@ void Graph::random_assignment(vector <pair <int_t, bool> >& bad_vertices) {
         while (false_ < best.size() && best [false_].second) false_ ++;
         while (true_ < best.size() && !best [true_].second) true_ ++;
         if (false_ < best.size()) {
-            this -> edges_for_euler [best [false_].first].push_back(best [true_].first);
+            this -> edges_for_euler [best [false_].first].push_back(make_pair(best [true_].first, 0));
             false_ ++;
             true_ ++;
         }
     }
 }
 
+/**
+ * Depth-first search using both orientations of edges. Stores vertices with outdegree != indegree in unsatisfied.
+ */
 void Graph::search(int_t v, vector <bool>& visited, vector <pair <int_t, bool> >& unsatisfied) {
     visited [v] = true;
     if (edges_for_euler [v].size() != reverse_edges [v].size()) unsatisfied.push_back(make_pair(v, edges_for_euler [v].size() > reverse_edges [v].size()));
-    for (int_t new_v : edges_for_euler [v]) {
-        if (!visited [new_v]) {
-            search(new_v, visited, unsatisfied);
+    for (pair<int_t, int> edge : edges_for_euler [v]) {
+        if (!visited [edge.first]) {
+            search(edge.first, visited, unsatisfied);
         }
     }
     for (int_t new_v : reverse_edges [v]) {
@@ -142,7 +145,7 @@ void Graph::connect_components() {
         if (!visited [i]) {
             vector <pair <int_t, bool> > new_unsatisfied_vertices;
             search(i, visited, new_unsatisfied_vertices);
-            edges_for_euler [last_begin].push_back(i);
+            edges_for_euler [last_begin].push_back(make_pair(i, 0));
             reverse_edges [i].push_back(last_begin);
             last_begin = i;
         }
@@ -157,7 +160,7 @@ void Graph::construct_edges_for_euler() {
     this -> reverse_edges.resize(number_of_vertices);
     for (int i = 0; i < number_of_vertices; i++) {
         for (auto v : edges [i]) {
-            this -> edges_for_euler[i].push_back(v.first);
+            this -> edges_for_euler[i].push_back(make_pair(v.first, v.second));
             this -> reverse_edges [v.first].push_back(i);
         }
     }
@@ -172,8 +175,8 @@ void Graph::construct_edges_for_euler() {
     vector <int> degreecount (number_of_vertices, 0);
     for (int i = 0; i < number_of_vertices; i++) {
         degreecount [i] += this -> edges_for_euler [i].size();
-        for (int_t v : this -> edges_for_euler [i]) {
-            degreecount [v] --;
+        for (pair<int_t, int> edge : this -> edges_for_euler [i]) {
+            degreecount [edge.first] --;
         }
     }
 
@@ -194,13 +197,14 @@ void Graph::construct_edges_for_euler() {
     this->random_assignment(bad_vertices);
 }
 
-void Graph::euler_recursive(int_t v, vector <int_t>& result) {
+void Graph::euler_recursive(int_t v, vector <int_t>& result, int previous_count) {
     while (!edges_for_euler[v].empty()) {
-        int next = edges_for_euler [v].back();
+        pair<int_t, int> next = edges_for_euler [v].back();
         edges_for_euler[v].pop_back();
-        euler_recursive(next, result);
+        euler_recursive(next.first, result, next.second);
     }
     result.push_back(v);
+    this->result_counts.push_back(previous_count);
 }
 
 vector <int_t> Graph::euler_path() {
@@ -215,7 +219,7 @@ vector <int_t> Graph::euler_path() {
     }
 */
     vector <int_t> result;
-    euler_recursive(0, result);
+    euler_recursive(0, result, -1);
     reverse(result.begin(), result.end());
     vector <int_t> decompressed_result;
     for (int_t v : result) {
