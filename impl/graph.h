@@ -11,7 +11,7 @@ using namespace std;
 class Graph {
     map <int_t, int_t> label_compress;
     vector <int_t> label_decompress;
-    vector <map <int_t, int> > edges;
+//    vector <map <int_t, int> > edges;
     vector <vector <pair <int_t, int> > > edges_for_euler;
     vector <vector <int_t> > reverse_edges;
     vector <int> result_counts;
@@ -25,10 +25,11 @@ class Graph {
     int_t count_score(vector <pair <int_t, bool> >&);
     void euler_recursive(int_t, vector <int_t>&, int);
     public:
-        void add_edge(int_t, int_t);
+        void add_edge(int_t, int_t, vector <map <int_t, int> >&);
         Graph(int kk): k(kk){}
         vector <int_t> euler_path();
         vector <int> path_counts();
+        void load_edges();
 };
 
 #endif //GRAPH_H

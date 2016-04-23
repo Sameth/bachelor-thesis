@@ -6,7 +6,7 @@
 #include <iostream>
 
 #ifndef RETRIES
-#define RETRIES 1000
+#define RETRIES 100
 #endif
 
 #ifndef VERTICES_THRESHOLD
@@ -23,7 +23,29 @@ bool is_false(pair<int_t, bool> e) {
     return !e.second;
 }
 
-void Graph::add_edge(int_t from, int_t to) {
+map<char, int_t> base_to_int = {{'A',0}, {'C',1}, {'G',2}, {'T',3}};
+//map<int_t, char> int_to_base = {{0,'A'}, {1,'C'}, {2,'G'}, {3,'T'}};
+
+
+vector <int_t> encode (string& s, int k) {
+    vector <int_t> result;
+    if ((int) s.size() < k) return result;
+    int_t roll = 0;
+    for (int i = 0; i < k - 1; i++) {
+        roll <<= 2;
+        roll += base_to_int [s [i]];
+    }
+    for (int i = k - 1; i < (int) s.size(); i++) {
+        roll <<= 2;
+        roll += base_to_int [s [i]];
+        roll &= (1LL << (2*k)) - 1;
+        result.push_back(roll);
+    }
+    return result;
+}
+
+
+void Graph::add_edge(int_t from, int_t to, vector <map <int_t, int> >& edges) {
     if (label_compress.count(from) == 0) {
 
         // Add vertex
@@ -45,12 +67,32 @@ void Graph::add_edge(int_t from, int_t to) {
     edges [label_compress [from]] [label_compress [to]] ++;
 }
 
+void Graph::load_edges() {
+    vector <map <int_t, int> > edges;
+    string seq;
+    while(cin >> seq) {
+        vector <int_t> encoded = encode(seq , k - 1);
+        for (int j = 0; j < (int) encoded.size() - 1; j++) {
+            add_edge(encoded [j], encoded [j + 1], edges);
+        }
+    }
+    this -> edges_for_euler.clear();
+    this -> edges_for_euler.resize(number_of_vertices);
+    this -> reverse_edges.resize(number_of_vertices);
+    for (int i = 0; i < number_of_vertices; i++) {
+        for (auto v : edges [i]) {
+            this -> edges_for_euler[i].push_back(make_pair(v.first, v.second));
+            this -> reverse_edges [v.first].push_back(i);
+        }
+    }
+}
+
 /**
  * Count the length of oriented edge from v1 to v2.
  */
 int_t Graph::count_distance(int_t v1, int_t v2) {
     int_t label1 = label_decompress [v1], label2 = label_decompress [v2];
-    int_t scope = (1 << (2*k - 4)) - 1;
+    int_t scope = (1LL << (2*k - 4)) - 1;
     label1 &= scope;
     label2 >>= 2;
 
@@ -88,6 +130,7 @@ int_t Graph::count_score(vector <pair <int_t, bool> >& assignment) {
  * Adds picked edges to the graph, to make it eulerian.
  */
 void Graph::random_assignment(vector <pair <int_t, bool> >& bad_vertices) {
+    cerr << "begin asignment" << endl;
     if (bad_vertices.empty()) return;
     vector <pair <int_t, bool> > best = bad_vertices;
     int_t score = this -> count_score (best);
@@ -135,6 +178,7 @@ void Graph::search(int_t v, vector <bool>& visited, vector <pair <int_t, bool> >
 // TODO: Do something more intelligent (like: match vertex with outdegree > indegree
 // with a vertex with outdegree < indegree if possible)
 void Graph::connect_components() {
+    cerr << "begin connecting" << endl;
     vector <pair <int_t, bool> > unsatisfied_vertices;
     vector <int_t> all_vertices;
     vector <bool> visited(number_of_vertices, false);
@@ -155,15 +199,6 @@ void Graph::connect_components() {
 void Graph::construct_edges_for_euler() {
 
     // First, collapse set into a vector (we might need duplicates).
-    this -> edges_for_euler.clear();
-    this -> edges_for_euler.resize(number_of_vertices);
-    this -> reverse_edges.resize(number_of_vertices);
-    for (int i = 0; i < number_of_vertices; i++) {
-        for (auto v : edges [i]) {
-            this -> edges_for_euler[i].push_back(make_pair(v.first, v.second));
-            this -> reverse_edges [v.first].push_back(i);
-        }
-    }
 
     // Connect all the components (in unoriented sense)
     this -> connect_components();
@@ -197,6 +232,10 @@ void Graph::construct_edges_for_euler() {
     this->random_assignment(bad_vertices);
 }
 
+vector <int> Graph::path_counts() {
+    return result_counts;
+}
+
 void Graph::euler_recursive(int_t v, vector <int_t>& result, int previous_count) {
     while (!edges_for_euler[v].empty()) {
         pair<int_t, int> next = edges_for_euler [v].back();
@@ -219,12 +258,14 @@ vector <int_t> Graph::euler_path() {
     }
 */
     vector <int_t> result;
+    cerr << "begin recursive euler" << endl;
     euler_recursive(0, result, -1);
     reverse(result.begin(), result.end());
     vector <int_t> decompressed_result;
     for (int_t v : result) {
         decompressed_result.push_back(label_decompress [v]);
     }
+    cerr << "finish\n";
     return decompressed_result;
 }
 

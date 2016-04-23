@@ -2,3 +2,4 @@ main.*
 !main.tex
 *.bin
 impl/sdsl-lite/*
+impl/data/*
