@@ -9,15 +9,11 @@
 using namespace std;
 
 class Graph {
-    map <int_t, int_t> label_compress;
     vector <int_t> label_decompress;
-//    vector <map <int_t, int> > edges;
     vector <vector <pair <int_t, int> > > edges_for_euler;
-    vector <vector <int_t> > reverse_edges;
     vector <int> result_counts;
-    int number_of_vertices = 0;
+    int_t number_of_vertices = 0;
     int k;
-    void search(int_t, vector <bool>&, vector <pair<int_t, bool> >&);
     void connect_components();
     void construct_edges_for_euler();
     void random_assignment(vector <pair <int_t, bool> >&);
@@ -25,11 +21,11 @@ class Graph {
     int_t count_score(vector <pair <int_t, bool> >&);
     void euler_recursive(int_t, vector <int_t>&, int);
     public:
-        void add_edge(int_t, int_t, vector <map <int_t, int> >&);
+        void add_edge(int_t, int_t, vector <map <int_t, int> >&, map<int_t, int_t>&);
         Graph(int kk): k(kk){}
         vector <int_t> euler_path();
         vector <int> path_counts();
-        void load_edges();
+        void load_edges(char[]);
 };
 
 #endif //GRAPH_H

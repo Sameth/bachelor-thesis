@@ -6,25 +6,7 @@
 using namespace std;
 using namespace sdsl;
 
-//map<char, int_t> base_to_int = {{'A',0}, {'C',1}, {'G',2}, {'T',3}};
 map<int_t, char> int_to_base = {{0,'A'}, {1,'C'}, {2,'G'}, {3,'T'}};
-
-/*vector <int_t> encode (string& s, int k) {
-    vector <int_t> result;
-    if ((int) s.size() < k) return result;
-    int_t roll = 0;
-    for (int i = 0; i < k - 1; i++) {
-        roll <<= 2;
-        roll += base_to_int [s [i]];
-    }
-    for (int i = k - 1; i < (int) s.size(); i++) {
-        roll <<= 2;
-        roll += base_to_int [s [i]];
-        roll &= (1LL << (2*k)) - 1;
-        result.push_back(roll);
-    }
-    return result;
-}*/
 
 string decode_two(int_t v1, int_t v2, int k, int count, vector <int>& string_counts) {
     int_t cv1 = v1, cv2 = v2;
@@ -66,31 +48,27 @@ string decode(vector <int_t> superstring, int k, vector <int> path_counts, vecto
     return result;
 }
 
-int main () {
-    int n = 0, k;
-    scanf("%d", &k);
+string construct_superstring(int k, char fasta_file[], vector <int>& string_counts) {
     Graph g(k);
-    g.load_edges();
+    g.load_edges(fasta_file);
 
     vector <int_t> result_ints = g.euler_path();
     vector <int> result_counts = g.path_counts();
-    g = Graph(3);
-/*    for (int i = 0; i < result_ints.size(); i++) {
-        cout << result_ints [i] << ' ';
-    }
-    cout << endl;
 
-    for (int i = 0; i < result_counts.size(); i++) {
-        cout << result_counts [i] << ' ';
+    return decode(result_ints, k, result_counts, string_counts);
+}
+
+int main (const int argc, char* argv[]) {
+    string usage = string(argv [0]) + " <k> <fasta_file>";
+    if (argc < 3) {
+        cout << usage << endl;
+        return 1;
     }
-    cout << endl;
-*/    
+    int k = atol(argv [1]);
     vector <int> string_counts;
-    string result = decode(result_ints, k, result_counts, string_counts);
-    cout << result << endl;
-    
-//    csa_wt<> fm_index;
-//    construct_im(fm_index, result, 1);
+    string superstring = construct_superstring(k, argv[2], string_counts);
+    csa_wt<> fm_index;
+    construct_im(fm_index, superstring, 1);
+    cout << size_in_mega_bytes(fm_index) << endl;
 
-            
 }
