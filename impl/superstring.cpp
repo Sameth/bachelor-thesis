@@ -1,7 +1,9 @@
 #include <bits/stdc++.h>
 #include "common.h"
 #include "graph.h"
+#include "util.hpp"
 #include <sdsl/suffix_arrays.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace sdsl;
@@ -48,7 +50,7 @@ string decode(vector <int_t> superstring, int k, vector <int> path_counts, vecto
     return result;
 }
 
-string construct_superstring(int k, char fasta_file[], vector <int>& string_counts) {
+string construct_superstring(int k, string fasta_file, vector <int>& string_counts) {
     Graph g(k);
     g.load_edges(fasta_file);
 
@@ -65,10 +67,15 @@ int main (const int argc, char* argv[]) {
         return 1;
     }
     int k = atol(argv [1]);
+    boost::filesystem::path tmpdir = create_tmpdir() / "super";
+    boost::filesystem::path orig_file = boost::filesystem::path(argv [2]);
+    
+    execute_command("sga index -a ropebwt -c -t 4 -p " + tmpdir.string() + " " + orig_file.string());
+    execute_command("sga correct -t 16 -p " + tmpdir.string() + " -o " + tmpdir.string() + ".ec.fa " + orig_file.string());
     vector <int> string_counts;
-    string superstring = construct_superstring(k, argv[2], string_counts);
+    string superstring = construct_superstring(k, tmpdir.string() + ".ec.fa", string_counts);
     csa_wt<> fm_index;
     construct_im(fm_index, superstring, 1);
-    cout << size_in_mega_bytes(fm_index) << endl;
-
+    cout << "FM index size: " << size_in_mega_bytes(fm_index) << endl;
+    cout << superstring << endl;
 }

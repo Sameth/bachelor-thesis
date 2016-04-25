@@ -61,18 +61,23 @@ void Graph::add_edge(int_t from, int_t to, vector <map <int_t, int> >& edges, ma
     edges [label_compress [from]] [label_compress [to]] ++;
 }
 
-void Graph::load_edges(char fasta_file[]) {
+void Graph::load_edges(string& fasta_file) {
     vector <map <int_t, int> > edges;
     map <int_t, int_t> label_compress;
+    cerr << "opening " + fasta_file << endl;
     ifstream file_in(fasta_file, ifstream::in);
     string seq;
+    int_t n = 0;
     while(file_in >> seq) {
+        n ++;
         file_in >> seq;
         vector <int_t> encoded = encode(seq , k - 1);
         for (int j = 0; j < (int) encoded.size() - 1; j++) {
             add_edge(encoded [j], encoded [j + 1], edges, label_compress);
         }
     }
+    cerr << "read " << n << " reads" << endl;
+    file_in.close();
     this -> edges_for_euler.clear();
     this -> edges_for_euler.resize(number_of_vertices);
     for (int_t i = 0; i < number_of_vertices; i++) {
