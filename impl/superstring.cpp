@@ -27,7 +27,7 @@ string decode_two(int_t v1, int_t v2, int k, int count, vector <int>& string_cou
     for (int i = 0; i < add; i++) {
         result.push_back (int_to_base [cv2 & 3]);
         cv2 >>= 2;
-        string_counts.push_back(count);
+        string_counts.push_back(count + 1);
     }
     reverse(result.begin(), result.end());
     return result;
@@ -39,7 +39,7 @@ string decode(vector <int_t> superstring, int k, vector <int> path_counts, vecto
     int_t label1 = superstring [0], label2;
     for (int i = 0; i < k - 1; i++) {
         result.push_back(int_to_base [label1 & 3]);
-        string_counts.push_back(1);
+        string_counts.push_back(2);
         label1 >>= 2;
     }
     reverse(result.begin(), result.end());
@@ -50,15 +50,18 @@ string decode(vector <int_t> superstring, int k, vector <int> path_counts, vecto
     return result;
 }
 
-string construct_superstring(int k, string fasta_file, vector <int>& string_counts) {
+tuple<string, vector <int> > construct_superstring(int k, string fasta_file) {
     Graph g(k);
     g.load_edges(fasta_file);
 
     vector <int_t> result_ints = g.euler_path();
     vector <int> result_counts = g.path_counts();
+    vector <int> string_counts;
 
-    return decode(result_ints, k, result_counts, string_counts);
+    return make_tuple (decode(result_ints, k, result_counts, string_counts), string_counts);
 }
+
+
 
 int main (const int argc, char* argv[]) {
     string usage = string(argv [0]) + " <k> <fasta_file>";
@@ -67,15 +70,17 @@ int main (const int argc, char* argv[]) {
         return 1;
     }
     int k = atol(argv [1]);
-    boost::filesystem::path tmpdir = create_tmpdir() / "super";
+//    boost::filesystem::path tmpdir = create_tmpdir() / "super";
     boost::filesystem::path orig_file = boost::filesystem::path(argv [2]);
     
-    execute_command("sga index -a ropebwt -c -t 4 -p " + tmpdir.string() + " " + orig_file.string());
-    execute_command("sga correct -t 16 -p " + tmpdir.string() + " -o " + tmpdir.string() + ".ec.fa " + orig_file.string());
-    vector <int> string_counts;
-    string superstring = construct_superstring(k, tmpdir.string() + ".ec.fa", string_counts);
+/*    execute_command("sga index -a ropebwt -c -t 4 -p " + tmpdir.string() + " " + orig_file.string());
+    execute_command("sga correct -t 16 -p " + tmpdir.string() + " -o " + tmpdir.string() + ".ec.fa " + orig_file.string()); */
+    tuple <string, vector <int> > superstring_result = construct_superstring(k, orig_file.string());
     csa_wt<> fm_index;
-    construct_im(fm_index, superstring, 1);
+    construct_im(fm_index, get<0>(superstring_result), 1);
     cout << "FM index size: " << size_in_mega_bytes(fm_index) << endl;
-    cout << superstring << endl;
+//    cout << get<0>(superstring_result) << endl;
+    cout << "enc: " << size_in_mega_bytes(enc_vector<>(get<1>(superstring_result))) << endl;
+    cout << "vlc: " << size_in_mega_bytes(vlc_vector<>(get<1>(superstring_result))) << endl;
+    cout << "dac: " << size_in_mega_bytes(dac_vector<>(get<1>(superstring_result))) << endl;
 }
