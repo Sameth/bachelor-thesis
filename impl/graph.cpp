@@ -61,7 +61,7 @@ void Graph::add_edge(int_t from, int_t to, vector <map <int_t, int> >& edges, ma
     edges [label_compress [from]] [label_compress [to]] ++;
 }
 
-void Graph::load_edges(string& fasta_file) {
+void Graph::load_edges(const string& fasta_file) {
     vector <map <int_t, int> > edges;
     map <int_t, int_t> label_compress;
     cerr << "opening " + fasta_file << endl;

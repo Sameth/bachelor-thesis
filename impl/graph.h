@@ -25,7 +25,7 @@ class Graph {
         Graph(int kk): k(kk){}
         vector <int_t> euler_path();
         vector <int> path_counts();
-        void load_edges(string&);
+        void load_edges(const string&);
 };
 
 #endif //GRAPH_H

@@ -1,9 +1,4 @@
-#include <bits/stdc++.h>
-#include "common.h"
-#include "graph.h"
-#include "util.hpp"
-#include <sdsl/suffix_arrays.hpp>
-#include <boost/filesystem.hpp>
+#include "sr-index.hpp"
 
 using namespace std;
 using namespace sdsl;
@@ -50,18 +45,69 @@ string decode(vector <int_t> superstring, int k, vector <int> path_counts, vecto
     return result;
 }
 
-tuple<string, vector <int> > construct_superstring(int k, string fasta_file) {
-    Graph g(k);
+void SR_index::construct_superstring(const string& fasta_file) {
+    Graph g(this -> k);
     g.load_edges(fasta_file);
 
     vector <int_t> result_ints = g.euler_path();
     vector <int> result_counts = g.path_counts();
     vector <int> string_counts;
-
-    return make_tuple (decode(result_ints, k, result_counts, string_counts), string_counts);
+    
+    cerr << "Construct FM-index\n";
+    construct_im(this -> fm_index, decode(result_ints, this -> k, result_counts, string_counts), 1);
+    this -> counts = vlc_vector<>(string_counts);
 }
 
+void SR_index::construct(const string& fasta_file) {
+    construct_superstring(fasta_file);
+    cerr << "start processing intervals" << endl;
+    
+    ifstream file_in(fasta_file, ifstream::in);
+    string seq;
+    vector <int> intervals;
+    vector <bool> starts;
+    int k = this -> k;
+    while (file_in >> seq) {
+        file_in >> seq;
+        vector <int> positions;
+        for (int i = 0; i <= (int) seq.size() - k; i++) {
+            auto occs = locate(fm_index, seq.substr(i, k));
+            for (int pos : occs) {
+                if (counts [pos + k - 1] > 1) {
+                    positions.push_back(pos);
+                    break;
+                }
+                assert(false);
+            }
+        }
+        sort (positions.begin(), positions.end());
+        positions.resize((int) (unique(positions.begin(), positions.end()) - positions.begin()));
+        intervals.push_back(positions [0]);
+        intervals.push_back(positions [0]);
+        starts.push_back(true);
+        starts.push_back(false);
+        for (int i = 1; i < positions.size(); i++) {
+            if (intervals.back() + 1 == positions [i]) intervals.back()++;
+            else {
+                intervals.push_back(positions [i]);
+                intervals.push_back(positions [i]);
+                starts.push_back(false);
+                starts.push_back(false);
+            }
+        }
+    }
 
+    file_in.close();
+
+    for (int i = 0; i < intervals.size(); i++) {
+        intervals [i] += k - 1;
+    }
+    
+    cerr << "intervals vlc: " << size_in_mega_bytes(vlc_vector<>(intervals)) << endl;
+    bit_vector starts_b(starts.size());
+    for (unsigned int i = 0; i < starts.size(); i++) starts_b [i] = starts [i];
+    cerr << "starts sd_vector: " << size_in_mega_bytes(sd_vector<>(starts_b)) << endl;
+}
 
 int main (const int argc, char* argv[]) {
     string usage = string(argv [0]) + " <k> <fasta_file>";
@@ -69,18 +115,15 @@ int main (const int argc, char* argv[]) {
         cout << usage << endl;
         return 1;
     }
+    struct rlimit stack_limit;
+    getrlimit(RLIMIT_STACK, &stack_limit);
+    stack_limit.rlim_cur = RLIM_INFINITY;
+    if (setrlimit(RLIMIT_STACK, &stack_limit) != 0) {
+        cerr << "Unlimiting stack size failed, might crash.\n";
+    }
     int k = atol(argv [1]);
-//    boost::filesystem::path tmpdir = create_tmpdir() / "super";
     boost::filesystem::path orig_file = boost::filesystem::path(argv [2]);
-    
-/*    execute_command("sga index -a ropebwt -c -t 4 -p " + tmpdir.string() + " " + orig_file.string());
-    execute_command("sga correct -t 16 -p " + tmpdir.string() + " -o " + tmpdir.string() + ".ec.fa " + orig_file.string()); */
-    tuple <string, vector <int> > superstring_result = construct_superstring(k, orig_file.string());
-    csa_wt<> fm_index;
-    construct_im(fm_index, get<0>(superstring_result), 1);
-    cout << "FM index size: " << size_in_mega_bytes(fm_index) << endl;
-//    cout << get<0>(superstring_result) << endl;
-    cout << "enc: " << size_in_mega_bytes(enc_vector<>(get<1>(superstring_result))) << endl;
-    cout << "vlc: " << size_in_mega_bytes(vlc_vector<>(get<1>(superstring_result))) << endl;
-    cout << "dac: " << size_in_mega_bytes(dac_vector<>(get<1>(superstring_result))) << endl;
+    SR_index index(k);
+    index.construct(orig_file.string());
+
 }
