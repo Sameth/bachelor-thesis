@@ -92,6 +92,7 @@ Formálnejšie zapísané, nech $slovo(V)$ označuje reťazec dĺžky $k-1$, ozn
 $V$ a $slovo(e)$ označuje reťazec priradený hrane $e$. Potom $slovo(w)$, slovo
 prislúchajúce sledu $w = V_1 e_1 V_2 e_2 \ldots e_{n-1} V_n$ skonštruujeme nasledovne: 
 $$slovo(w) = slovo(V) \cdot slovo(e1) \cdot slovo(e2) \cdots slovo(e_{n-1}).$$
+Pre prázdny sled $w$ definujeme $slovo(w) = \varepsilon$, čiže prázdne slovo.
 
 Sled v $k$-grafe množiny $S$ budeme volať \emph{korektný}, ak obsahuje všetky \emph{nutné} hrany.
 Teraz si dokážeme, že slovo prislúchajúce \emph{korektnému} sledu v $k$-grafe množiny $S$ je
@@ -193,34 +194,42 @@ nejakým spôsobom vynechať. Túto vlastnosť si ďalej zhrnieme. Predtým si z
 ľubovoľnému $k$-nadslovu a dokážeme jej vlastnosti.
 
 \begin{defn}
-    Nech $s = x_1 x_2 \cdots x_n$ je $k$-nadslovom množiny $S$, nech $G$ je $k$-grafom množiny $S$, nech
+    Nech $S$ je množina slov nad abecedou $\Sigma$, $s = x_1 x_2 \cdots x_n$ je nejakým slovom nad abecedou $\Sigma$,
+    nech $G$ je $k$-grafom množiny $S$, nech \\
     $Z = \{ i \in \{1 \ldots n - k + 2 \} | (x_i x_{i+1} \cdots x_{i+k-2}) \in V(G) \}$
-    a nech $v_i$ je $i$-ty najmenší prvok množiny $Z$. Potom \textit{sled nadslova $s$} určíme ako
-    $$sled_S(s) = V_1 e_1 V_2 e_2 \cdots e_{p-1} V_p,$$
-    kde $V_i = (x_{v_i} x_{v_i + 1} \cdots x_{v_i + k - 2})$ a $e_i$ je hrana medzi $V_i$ a $V_{i+1}$. 
+    a nech $v_i$ je $i$-ty najmenší prvok množiny $Z$. Potom pre neprázdnu množinu $Z$ určíme \textit{$k$-sled slova $s$ pri množine $S$} ako
+    $$sled_{k,S}(s) = V_1 e_1 V_2 e_2 \cdots e_{p-1} V_p,$$
+    kde $V_i = (x_{v_i} x_{v_i + 1} \cdots x_{v_i + k - 2})$ a $e_i$ je hrana medzi $V_i$ a $V_{i+1}$. Pre prázdnu
+    množinu $Z$ určíme $sled_{k, S}(s)$ ako prázdny sled.
 \end{defn}
 
 \begin{veta}
-    Nech $s = x_1 x_2 \cdots x_n$ je $k$-nadslovom množiny $S$. Potom aj $slovo(sled_S(s))$ je
+    Nech $s = x_1 x_2 \cdots x_n$ je $k$-nadslovom množiny $S$. Potom aj $slovo(sled_{k,S}(s))$ je
     $k$-nadslovom množiny $S$.
 \end{veta}
 
 \begin{proof}
     Nech $q = a_1 a_2 \cdots a_k$ je ľubovoľná $k$-tica písmen vyskytujúca sa v nejakom slove množiny $S$.
     Keďže $s$ je $k$-nadslovom množiny $S$, platí nasledovné: 
-    $$\exists i : a_1 = x_i, a_2 = x_{i+1}, \ldots a_k = x_{i+k-1}$$
+    $$\exists i : a_1 = x_i \wedge a_2 = x_{i+1} \wedge \ldots \wedge a_k = x_{i+k-1}$$
     Zároveň z konštrukcie $k$-grafu množiny $S$ vyplýva, že obsahuje vrcholy $U_1 = (x_i x_{i+1} \cdots x_{i+k-2})$
     a $U_2 = x_{i+1} x_{i+2} \cdots x_{i+k-1}$. Tým pádom množina $Z$ z konštrukcie sledu obsahuje aj $x_i$, aj
-    $x_{i+1}$, čiže $sled(s)$ obsahuje podsled $U_1 e U_2$ a teda $slovo (sled(s))$ obsahuje $q$.
+    $x_{i+1}$, čiže $sled_{k,S}(s)$ obsahuje podsled $U_1 e U_2$ a teda $slovo (sled_{k,S}(s))$ obsahuje $q$.
 \end{proof}
 
 \begin{veta}
-    Nech $s = a_1 a_2 \cdots a_k$ je $k$-nadslovom množiny $S$. Potom 
-    $$|slovo(sled_S(s))| \leq |s|.$$
+    Nech $S$ je množina slov nad abecedou $\Sigma$, $n$ je prirodzené a $k$ je kladné celé číslo, nech $s = a_1 a_2 \cdots a_n$ je
+    nejakým slovom nad $S$. Potom $|slovo(sled_{k,S}(s))| \leq |s|.$
 \end{veta}
 
 \begin{proof}
-    a
+    Nech $G$ je $k$-graf množiny $S$. Dokážeme matematickou indukciou na $n$, dĺžku slova $s$.
+
+    $1^0:$  $n = 0$. Keďže $k > 0 = n$, množina $Z$ z konštrukcie $k$-sledu bude prázdna, teda aj $sled_{k,S}(s)$ bude
+            prázdny, čiže $slovo (sled_{k,S}(s)) = \varepsilon, |\varepsilon| \leq 0$.
+
+    $2^0:$  
+    
 \end{proof}
 
 \begin{veta}
