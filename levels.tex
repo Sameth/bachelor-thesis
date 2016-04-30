@@ -1,4 +1,4 @@
-\chapter{Požiadavky na riešenie}
+\chapter{Hľadanie nadslova}
 
 Problém, ktorý riešime v tejto práci sa dá rozdeliť na tri základné úrovne podľa toho,
 ako veľmi berieme do úvahy požadovanú funkcionalitu a povahu reálnych dát. Pôjde o:
@@ -7,25 +7,18 @@ ako veľmi berieme do úvahy požadovanú funkcionalitu a povahu reálnych dát.
     \item Indexovanie do $k$-nadslova
     \item Tolerancia chýb v dátach
 \end{enumerate}
-V tejto kapitole sa pozrieme na každú z týchto úrovní. Popíšeme spôsob, akým zasahujú
-do riešenia, ako ovplyvňujú ťažkosť a zložitosť a popíšeme si, ako problém danej
-úrovne budeme riešiť.
+V tejto kapitole sa pozrieme na prvú z týchto úrovní, pozrieme sa na ťažkosť problému
+a na spôsob, akým vieme $k$-nadslovo hľadať efektívne, pokiaľ sú splnené pre naše
+použitie rozumné predpoklady.
 
-%##################################################################################
-\section{Hľadanie $k$-nadslova}
-%##################################################################################
-
-Prvým a najmenej zložitým problémom je hľadanie najkratšieho $k$-nadslova množiny $S$. Na pripomenuie,
-ide o nadslovo, ktoré obsahuje všetky podslová dĺžky $k$ zo slov v $S$.
-
-Mohlo by sa zdať, že ide o slabšiu verziu problému hľadania
+Mohlo by sa zdať, že hľadanie $k$-nadslova je slabšou verziou problému hľadania
 spoločného nadslova, keďže ľubovoľné nadslovo nejakej množiny reťazcov bude zároveň
-$k$-nadslovom tejto množiny reťazcov, ale ľahko vidno, že naopak to neplatí.
+$k$-nadslovom tejto množiny reťazcov a ľahko vidno, že naopak to neplatí.
 Ukazuje sa však, že rovnako, ako problém hľadania najkratšieho nadslova, je aj
 problém hľadania najkratšieho $k$-nadslova $\mathcal{NP}$-ťažký.
 
 %##################################################################################
-\subsection{$\mathcal{NP}$-ťažkosť problému}
+\section{$\mathcal{NP}$-ťažkosť problému}
 %##################################################################################
 
 Rozhodovacia verzia problému najkratšieho spoločného nadslova je pomocou redukcie
@@ -51,7 +44,7 @@ najkratšieho $k$-nadslova a tým pádom aj $\mathcal{NP}$-ťažkosť problému 
 najkratšieho $k$-nadslova.
 
 %###############################################################################
-\subsection{Abstrakcia}
+\section{Abstrakcia}
 %###############################################################################
 
 Po zdôvodnení a dokázaní ťažkosti riešeného problému sa pozrieme na spôsob, akým ho budeme
@@ -93,7 +86,8 @@ Takto skonštruovaný graf k množine vstupných slov $S$ budeme označovať ako
 Môžeme si všimnúť, že reťazec priradený každej \emph{nutnej} hrane vieme vyjadriť
 presne rovnako, ako reťazec priradený každej \emph{nepovinnej} hrane. Ďalším pozorovaním,
 ktoré sa nám bude hodiť najmä pri implementácii je, že reťazec priradený každej
-hrane vieme vypočítať iba z označení jej koncových vrcholov.
+hrane vieme vypočítať iba z označení jej koncových vrcholov. Posledné dôležité
+pozorovanie je, že každá hrana má kladnú cenu.
 
 Slovo prislúchajúce sledu v $k$-grafe množiny $S$ získame ako zreťazenie $zr$, kde $z$ je
 označenie prvého vrchola sledu a $r$ sú pospájané reťazce priradené hranám v takom
@@ -104,6 +98,9 @@ $V$ a $slovo(e)$ označuje reťazec priradený hrane $e$. Potom $slovo(w)$, slov
 prislúchajúce sledu $w = V_1 e_1 V_2 e_2 \ldots e_{n-1} V_n$ skonštruujeme nasledovne: 
 $$slovo(w) = slovo(V) \cdot slovo(e1) \cdot slovo(e2) \cdots slovo(e_{n-1}).$$
 Pre prázdny sled $w$ definujeme $slovo(w) = \varepsilon$, čiže prázdne slovo.
+
+Z tejto konštrukcie vidíme, že dĺžku slova priradeného neprázdnemu sledu vieme
+vypočítať ako $k-1 + \sum \limits_{i=1}^{n-1} cena(e_i)$
 
 Sled v $k$-grafe množiny $S$ budeme volať \emph{korektný}, ak obsahuje všetky \emph{nutné} hrany.
 Teraz si dokážeme, že slovo prislúchajúce \emph{korektnému} sledu v $k$-grafe množiny $S$ je
@@ -157,6 +154,21 @@ sú znaky tohto slova v poradí. Potom sa v grafe vyskytujú vrcholy $V_1 = (x_1
 že z $V_1$ ide hrana $e$ do $V_2$ a $e$ je \emph{nutná}. Z toho vyplýva, že $W$ = $U_1 V_1 e V_2 U_2$, kde $U_1, U_2$ sú nejaké časti sledu.
 Z predošlej lemy potom vyplýva, že $\exists q \in \{A,C,G,T \}^*: slovo(U_1 V_1) =  q \cdot x_1 \cdots x_{k - 1}$ a teda
 $$slovo(W) = slovo(U_1 V_1 e V_2 U_2) = q \cdot x_1 \cdots x_{k - 1} \cdot slovo(e) \cdot slovo (V_2 U_2) = q \cdot w \cdot slovo(V_2 U_2).\qedhere$$
+\end{proof}
+
+Nakoniec si spomenieme ešte jednu peknú vlastnosť, ktorá sa nám bude hodiť neskôr.
+
+\begin{lema}
+\label{shortest_edge_lemma}
+    Nech $U$ a $V$ sú vrcholmi $k$-grafu množiny $S$. Potom najkratší sled z $U$
+    do $V$ obsahujúci aspoň jednu hranu má rovnakú cenu, ako hrana $e$ z vrchola $U$ do $V$.
+\end{lema}
+
+\begin{proof}
+    Sporom. Nech $w := U e_1 U_1 e_2 \cdots e_n V$ je kratšia cesta. Z lemy \ref{vertex_end_lemma} vieme,
+    že aj $slovo(U e V)$ aj $slovo(w)$ sa končia označením vrchola $V$, zároveň, keďže $w$ má
+    menšiu cenu ako $e$, platí $|slovo(w)| < |slovo(U e V)|$. To je ale v spore s tým, že prekryv
+    $U$ s $V$ je najdlhší možný, $slovo(w)$ nám dáva návod, ako zostrojiť kratší.
 \end{proof}
 
 %##################################################################################
@@ -267,11 +279,11 @@ a zároveň ho nenafúkne, si ďalej dokážeme.
                       kde $e_p$ je hrana z $V_p$ do $V_0$. Z konštrukcie slova k sledu vieme nasledovné: \\
                       $$slovo(sled_{k,S}(s)) = slovo(V_1) slovo(e_1) slovo(e_2) \cdots slovo(e_p) = $$
                       $$ = slovo(sled_{k,S}(s'')) \cdot slovo(e_p).$$
-                      Podľa lemy \ref{vertex_end_lemma} sa $slovo(sled_{k,S}(s''))$ končí označením vrchola $V_q$, čiže rovnako, ako $s''$,
+                        Podľa lemy \ref{vertex_end_lemma} sa $slovo(sled_{k,S}(s''))$ končí označením vrchola $V_q$, čiže rovnako, ako $s''$,
                       podobne sa $slovo(sled_{k,S}(s))$ končí tou istou $k-1$-ticou ako $s$, z indukčného predpokladu vyplýva, že $|slovo(sled_{k,S}(s''))| \leq |s''|$.
                       Ak by teda platilo $|slovo(sled_{k,S}(s))| > |s|$, bolo by dokončenie $s$ v $s''$ kratšie, než dokončenie $V_0$ vo $V_q$,
-                      čo by bolo ale v spore s tým, že prekryv $V_0$ s $V_q$ je definovaný ako najdlhší možný a teda dokončenie $V_0$ vo $V_q$
-                      je najkratšie možné. Aj v tomto prípade teda platí indukčný krok.
+                      čo je v spore s tým, že prekryv $V_0$ s $V_q$ je definovaný ako najdlhší možný, podobne ako v dôkaze lemy \ref{shortest_edge_lemma}.
+                      Aj v tomto prípade teda platí indukčný krok.
             \end{itemize}
     
 \end{proof}
@@ -281,9 +293,31 @@ a zároveň ho nenafúkne, si ďalej dokážeme.
 \end{dosl}
 
 %##################################################################################
-\subsection{Implementácia}
+\section{Implementácia}
 %##################################################################################
 
 V predošlej časti sme si dokázali, že pre nájdenie najkratšieho $k$-nadslova množiny slov $S$
 nám stačí nájsť najlacnejší korektný sled v $k$-grafe množiny $S$, čiže sled, ktorý obsahuje
-všetky \emph{nutné} hrany grafu.
+všetky \emph{nutné} hrany grafu. Ide o pomerne známy \textbf{problém vidieckeho poštára} z grafovej teórie,
+ktorý je vo všeobecnom prípade $\mathcal{NP}$-ťažký \cite{ruralpostman}.
+
+Ukazuje sa však, že pokiaľ podgraf $k$-grafu množiny $S$ obsahujúci iba \emph{nutné} hrany je súvislý,
+tento problém je polynomiálne riešiteľný a riešenie je takmer zhodné s riešením \textbf{problému čínskeho
+poštára} na orientovaných grafoch. Keďže zamýšľané použitie $k$-nadslova je na reprezentáciu sekvenčných čítaní, ktoré sú
+krátkymi podreťazcami celého genómu s vysokou mierou pokrytia, je pomerne pravdepodobné, že nutné hrany
+$k$-grafu týchto čítaní budú tvoriť stále súvislý graf, prípadne že budú obsahovať iba málo komponentov.
+Najprv sa teda pozrieme, ako hľadať $k$-nadslovo v súvislom $k$-grafe.
+
+%##################################################################################
+\subsection{Súvislý graf}
+%##################################################################################
+
+Problém čínskeho poštára sa zaoberá hľadaním najlacnejšieho sledu v grafe takého, že
+každou hranou prejde aspoň raz.
+
+Základnou myšlienkou riešenia problému čínskeho poštára je pridať hrany s čo najmenším súčtom do grafu
+tak, aby obsahoval eulerovský ťah. Tento prístup funguje preto, že každý sled priamo
+zodpovedá eulerovskému ťahu pre nejaké doplnenie hrán do grafu.
+
+Súvislý orientovaný graf je eulerovský práve vtedy, keď do každého vrchola vchádza toľko hrán,
+koľko z neho vychádza. 
