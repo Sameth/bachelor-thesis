@@ -393,4 +393,25 @@ genetických čítaní, chceli by sme mať nejaký spôsob, ako v lineárnom ča
 pospájanie týchto vrcholov. V našom navrhovanom riešení jednoducho vyskúšame pevne stanovený počet
 náhodných priradení a vyberieme z nich to najlacnejšie.
 
+%##################################################################################
+\subsection{Nesúvislý graf}
+%##################################################################################
 
+Už na začiatku sme si dokázali, že hľadanie $k$-nadslova je $\mathcal{NP}$-ťažký problém. Keďže
+sme si popísali a zdôvodnili polynomiálny algoritmus, ktorý vie nájsť $k$-nadslovo pre súvislý
+nutný podgraf $k$-grafu vstupnej množiny, je pomerne pravdepodobné, že v našej špeciálnej
+triede grafov neexistuje polynomiálne riešenie problému vidieckeho poštára.
+
+Naše riešenie v nesúvislom prípade teda bude vyzerať úplne rovnako, v predošlom
+riešení pozmeníme len posledný krok, hľadanie eulerovského ťahu. Keďže taký v našom grafe
+ani po pridaní hrán nemusí existovať, jednoducho nájdeme eulerovský ťah v každom komponente
+a jednoducho ich nadpojíme na seba. Na toto sa môžeme pozerať aj tak, že si medzi niektoré
+vrcholy v rôznych komponentoch pridáme hranu.
+
+Ako sme spomínali vyššie, z povahy dát, pre ktoré hľadáme $k$-nadslovo,
+je celkom pravdepodobné, že náš nutný podgraf bude súvislý, prípadne že bude mať iba málo
+komponentov. Zároveň, v našom riešení pridáme nanajvýš $c - 1$ hrán navyše oproti
+optimálnemu riešeniu. Ďalej vieme, že sme do grafu pridávali hrany najlacnejším spôsobom
+tak, aby v každom vrchole platilo $\delta_I = \delta_I$. Keďže najväčšia možná hodnota
+hrany je $k-1$, znamená to, že riešenie, ktoré takto nájdeme, bude najviac o $(k - 1)(c - 1)$ drahšie
+ako optimálne, čiže takto nájdené $k$-nadslovo bude nanajvýš o toľko dlhšie od najkratšieho možného.
