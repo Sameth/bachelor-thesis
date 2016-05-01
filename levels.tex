@@ -355,6 +355,6 @@ kde $x$ je veľkosť toku tečúca z vrchola $V$ do $U$.
 Keďže náš korektný sled nemusí začínať aj končiť v tom istom vrchole, potrebujeme
 nájsť v skutočnosti najlacnejší tok, ktorý je o $1$ menší než maximálny a pridať hrany podľa neho.
 Takýto tok môžeme nájsť napríklad pomocou algoritmu od Edmondsa a Karpa \cite{mincost_maxflow} v
-čase $O(n^3)$ kde $n$ je počet vrcholov, prípadne pomocou akéhokoľvek potenciálne rýchlejšieho
+čase $O(n^3)$ kde $n$ je počet vrcholov v tokovom grafe nášho $k$-grafu, prípadne pomocou akéhokoľvek potenciálne rýchlejšieho
 algoritmu na $2$ simulácie, kde v tej druhej si vhodným pridaním jedného vrchola vieme vynútiť
 obmedzenie najväčšieho toku na hodnotu o $1$ menšiu, než zistíme pri prvej simulácii.
