@@ -83,6 +83,10 @@ $S_2$. Pripomíname, že hodnotou tejto hrany bude dĺžka priradeného reťazca
 Takto skonštruovaný graf k množine vstupných slov $S$ budeme označovať ako
 \textbf{\boldmath$k$-graf množiny \boldmath$S$}.
 
+Kvôli časti o implementácii si zadefinujeme ešte pojem \emph{nutného podgrafu}.
+Pod pojmom \emph{nutný podgraf} $k$-grafu množiny $S$ budeme rozumieť faktorový
+podgraf $k$-grafu množiny $S$ obsahujúci iba nutné hrany.
+
 Môžeme si všimnúť, že reťazec priradený každej \emph{nutnej} hrane vieme vyjadriť
 presne rovnako, ako reťazec priradený každej \emph{nepovinnej} hrane. Ďalším pozorovaním,
 ktoré sa nám bude hodiť najmä pri implementácii je, že reťazec priradený každej
@@ -271,8 +275,8 @@ a zároveň ho nenafúkne, si ďalej dokážeme.
                       sledu k $s$ bude obsahovať jeden prvok, čiže $sled_{k,S}(s)$ obsahuje iba jeden vrchol. Preto $|slovo(sled_{k,S}(s))| = k - 1 \leq |s|$.
                 \item $V_0 := (a_{n-k+2} a_{n-k+3} \cdots a_n) \in V(G)$ a $sled_{k,S}(s')$ je neprázdny. Položíme \\
                       $j := max \{ i \in \{1 \ldots n - k + 1 \} | (x_i x_{i+1} \cdots x_{i+k-2}) \in V(G) \}$,
-                      čiže začiatok poslednej $k-1$-tice zodpovedajúcej nejakému vrcholu v $G$ a $s'' := a_1 a_2 \cdots a_{j+k-2}$,
-                      čiže $s'$ skrátené po koniec poslednej $k-1$-tice zodpovedajúcej nejakému vrcholu v $G$. Slová $s'$ a $s''$ majú
+                      čiže začiatok poslednej $k-1$-tice zodpovedajúcej nejakému vrchola v $G$ a $s'' := a_1 a_2 \cdots a_{j+k-2}$,
+                      čiže $s'$ skrátené po koniec poslednej $k-1$-tice zodpovedajúcej nejakému vrchola v $G$. Slová $s'$ a $s''$ majú
                       rovnakú množinu $Z$ z konštrukcie sledu, čiže majú priradený rovnaký sled a teda $slovo(sled_{k,S}(s')) = slovo(sled_{k,S}(s''))$.
 
                       Položme $sled_{k,S}(s'') = V_1 e_1 \cdots V_p$. Sled k slovu $s$ obsahuje práve jeden vrchol navyše, čiže $sled_{k,S}(s) = V_1 e_1 \cdots V_p e_p V_0$,
@@ -316,8 +320,37 @@ Problém čínskeho poštára sa zaoberá hľadaním najlacnejšieho sledu v gra
 každou hranou prejde aspoň raz.
 
 Základnou myšlienkou riešenia problému čínskeho poštára je pridať hrany s čo najmenším súčtom do grafu
-tak, aby obsahoval eulerovský ťah. Tento prístup funguje preto, že každý sled priamo
+tak, aby obsahoval eulerovský ťah \cite{chinesepostman}. Tento prístup funguje preto, že každý sled priamo
 zodpovedá eulerovskému ťahu pre nejaké doplnenie hrán do grafu.
 
-Súvislý orientovaný graf je eulerovský práve vtedy, keď do každého vrchola vchádza toľko hrán,
-koľko z neho vychádza. 
+Súvislý orientovaný graf obsahuje eulerovskú kružnicu práve vtedy, keď vstupný stupeň $\delta_I$ je rovný
+výstupnému stupňu $\delta_O$ v každom vrchole, eulerovský ťah existuje aj v prípade, keď sa v najviac
+dvoch vrcholoch vstupný a výstupný stupeň líšia o $1$. Ak teda $k$-graf množiny $S$ má túto
+vlastnosť, nájdenie korektného sled je už len záležitosťou nájdenia eulerovského ťahu.
+
+Pokiaľ nutný podgraf $k$-graf množiny $S$ túto vlastnosť nemá, potrebujeme čo najlacnejšie pridať hrany z vrcholov s 
+$\delta_O < \delta_I$ do vrcholov s $\delta_I < \delta_O$, pričom využívať môžeme aj nepovinné hrany.
+Z lemy \ref{shortest_edge_lemma} vyplýva, že najlacnejšia cesta medzi dvomi vrcholmi je hrana medzi
+nimi, čiže zaujímať nás budú iba hrany medzi vrcholmi. Z toho vyplýva aj konštrukcia nasledovného grafu.
+
+\begin{defn}
+    Nech $G$ je $k$-graf množiny $S$ a $G'$ je jeho nutný podgraf. Tokovým grafom grafu $G$
+    označíme graf $H$, ktorého množinu vrcholov skonštruujeme nasledovne:
+    $V(G') = \{s, t\} \cup V_h \cup V_p$, kde $V_h$ (hladné) je množina $\{ v \in V(G) | \delta_O^{G'}(v) > delta_I^{G'}(v) \}$
+    a $V_p$ (presýtené) je množina $\{ v \in V(G) | \delta_I^{G'}(v) > delta_O^{G'}(v)\}$.
+    Hrany grafu $H$ budú troch typov:
+    \begin{enumerate}
+        \item Tie hrany z grafu $G$, ktoré idú z presýteného vrchola do hladného s cenou rovnakou ako v $G$ a kapacitou $\infty$,
+        \item Hrany od $s$ do každého vrchola vo $V_p$ s cenou $0$. Kapacitu takéhoto typu hrany do vrchola $U$ určíme ako $\delta_I^{G'}(U) - \delta_O^{G'}(U)$,
+        \item Hrany od každého vrchola z $V_h$ do $t$ s cenou $0$. Kapacitu takéhoto typu hrany z vrchola $U$ určíme ako $\delta_O^{G'}(U) - \delta_I^{G'}(U)$.
+    \end{enumerate}
+    Žiadne iné hrany v grafe $H$ nebudú.
+\end{defn}
+
+Nájdenie najlacnejšieho maximálneho toku v tokovom grafe $k$-grafu bude zodpovedať
+najlacnejšiemu možnému pridaniu hrán do nutného podgrafu $k$-grafu tak, aby v ňom existovala eulerovská
+kružnica. Jednoducho sa pre každý nasýtený vrchol $V$ a hladný vrchol $U$ pridáme $x$ hrán z $V$ do $U$,
+kde $x$ je veľkosť toku tečúca z vrchola $V$ do $U$.
+
+Keďže náš korektný sled nemusí začínať aj končiť v tom istom vrchole, potrebujeme
+nájsť v skutočnosti najlacnejší tok, ktorý je o $1$ menší než maximálny a pridať hrany podľa neho.
