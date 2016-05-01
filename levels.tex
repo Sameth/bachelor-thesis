@@ -358,3 +358,39 @@ Takýto tok môžeme nájsť napríklad pomocou algoritmu od Edmondsa a Karpa \c
 čase $O(n^3)$ kde $n$ je počet vrcholov v tokovom grafe nášho $k$-grafu, prípadne pomocou akéhokoľvek potenciálne rýchlejšieho
 algoritmu na $2$ simulácie, kde v tej druhej si vhodným pridaním jedného vrchola vieme vynútiť
 obmedzenie najväčšieho toku na hodnotu o $1$ menšiu, než zistíme pri prvej simulácii.
+
+Ako posledné nám teda stačí nájsť eulerovský ťah v takto upravenom grafe a zrekonštruovať z neho
+nadslovo. Týmto sme si popísali polynomiálny algoritmus na hľadanie $k$-nadslova, pokiaľ je
+nutný podgraf $k$-grafu súvislý. Pre rekapituláciu si celý algoritmus uvedieme v dôkaze nasledujúcej
+vety.
+
+\begin{veta}
+    Nech $S$ je množina slov dlhých aspoň $k$ nad abecedou $\Sigma$. Potom ak je nutný podgraf $k$-grafu množiny $S$
+    súvislý, existuje polynomiálny algoritmus na hľadanie $k$-nadslova.
+\end{veta}
+
+\begin{proof}
+    Uvedieme si algoritmus, ktorý $k$-nadslovo nájde. Ku každému kroku uvedieme aj časovú zložitosť od počtu slov v
+    množine $S$, pre jednoduchosť za predpokladu, že každý reťazec má rozumne malú fixnú dĺžku.
+    \begin{enumerate}
+        \item Zostav nutný podgraf $k$-grafu zo vstupných slov a prečísluj vrcholy do intervalu $\left[0, pocet\right)$. $O(nk)$
+        \item Vyrieš problém najlacnejšieho maximálneho toku na tokovom grafe. $O(n^3)$
+        \item Pridaj hrany do grafu podľa výsledného toku. $O(n^2)$
+        \item Nájdi eulerovský ťah. $O(n)$
+        \item Transformuj eulerovský ťah na $k$-nadslovo. $O(nk)$
+    \end{enumerate}
+\end{proof}
+
+Poslednou vecou, ktorou sa budeme zaoberať v súvislom prípade, je časová zložitosť. Všetky časti
+algoritmu sa vykonávaju v čase lineárne závislom od veľkosti vstupu, okrem druhého a tretieho bodu.
+V týchto bodoch je pomerne nepravdepodobné, že existuje riešenie rýchlejšie, než kvadratické. To je
+spôsobené tým, že v najhoršom prípade môžu takmer všetky vrcholy grafu mať $\delta_I$ rôzne od $\delta_O$
+a algoritmus, ktorý nájde najlepšie priradenie, sa potrebuje pozrieť na každú hranu.
+
+Keďže hľadanie
+$k$-nadslova chceme využiť do dátovej štruktúry schopnej reprezentovať milióny až stovky miliónov
+genetických čítaní, chceli by sme mať nejaký spôsob, ako v lineárnom čase nájsť aspoň nejaké rozumné
+pospájanie týchto vrcholov. V našom navrhovanom riešení jednoducho vyskúšame pevne stanovený počet
+náhodných priradení a vyberieme z nich to najlacnejšie.
+
+
