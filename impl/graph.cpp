@@ -264,7 +264,8 @@ void Graph::construct_edges_for_euler() {
             }
         }
     }
-  
+    
+    cerr << "assignment problem size: " << bad_vertices.size() << endl;
     // Add edges so that the graph is eulerian.
     this->random_assignment(bad_vertices);
 }
