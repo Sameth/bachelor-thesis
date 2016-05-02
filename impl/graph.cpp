@@ -291,6 +291,7 @@ vector <int_t> Graph::euler_path() {
     cerr << "begin recursive euler" << endl;
     euler_recursive(0, result, -1);
     reverse(result.begin(), result.end());
+    reverse(result_counts.begin(), result_counts.end());
     vector <int_t> decompressed_result;
 
     for (int_t v : result) {

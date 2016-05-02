@@ -10,6 +10,7 @@ string decode_two(int_t v1, int_t v2, int k, int count, vector <int>& string_cou
     int_t add = 1, scope = (1LL << (2*k - 4)) - 1;
     cv1 &= scope;
     cv2 >>= 2;
+    vector <int> magic;
     while (cv1 != cv2) {
         add ++;
         cv2 >>= 2;
@@ -55,7 +56,9 @@ void SR_index::construct_superstring(const string& fasta_file) {
     
     cerr << "Construct FM-index\n";
     construct_im(this -> fm_index, decode(result_ints, this -> k, result_counts, string_counts), 1);
+    
     this -> counts = vlc_vector<>(string_counts);
+    cerr << fm_index.size() << ' ' << counts.size() << endl;
 }
 
 void SR_index::construct(const string& fasta_file) {
@@ -64,46 +67,51 @@ void SR_index::construct(const string& fasta_file) {
     
     ifstream file_in(fasta_file, ifstream::in);
     string seq;
-    vector <int> intervals;
+    vector <int> start_indices;
     vector <bool> starts;
     int k = this -> k;
+    int max_read = 0;
     while (file_in >> seq) {
         file_in >> seq;
-        vector <int> positions;
+        max_read = max(max_read, (int) seq.size());
+        vector <pair <int, int> > positions;
         for (int i = 0; i <= (int) seq.size() - k; i++) {
             auto occs = locate(fm_index, seq.substr(i, k));
+            bool found = false;
             for (int pos : occs) {
                 if (counts [pos + k - 1] > 1) {
-                    positions.push_back(pos);
+                    positions.push_back(make_pair(pos - i, i));
+                    found = true;
                     break;
                 }
-                assert(false);
+            }
+            if (!found) {
+                cerr << "error" << ' ' << seq.substr(i, k) << endl;
+                for (int pos : occs) {
+                    cerr << pos << endl;
+                }
+                exit(1);
             }
         }
         sort (positions.begin(), positions.end());
-        positions.resize((int) (unique(positions.begin(), positions.end()) - positions.begin()));
-        intervals.push_back(positions [0]);
-        intervals.push_back(positions [0]);
         starts.push_back(true);
-        starts.push_back(false);
+        start_indices.push_back(positions[0].first);
         for (int i = 1; i < positions.size(); i++) {
-            if (intervals.back() + 1 == positions [i]) intervals.back()++;
-            else {
-                intervals.push_back(positions [i]);
-                intervals.push_back(positions [i]);
-                starts.push_back(false);
+            if (start_indices.back() != positions [i].first) {
+                start_indices.push_back(positions [i].first);
                 starts.push_back(false);
             }
         }
+    }
+
+    for (int i = 0; i < start_indices.size(); i++) {
+        start_indices [i] += max_read;
     }
 
     file_in.close();
 
-    for (int i = 0; i < intervals.size(); i++) {
-        intervals [i] += k - 1;
-    }
-    
-    cerr << "intervals vlc: " << size_in_mega_bytes(vlc_vector<>(intervals)) << endl;
+    cerr << "start_intervals number of elements: " << start_indices.size() << endl;
+    cerr << "start_intervals vlc: " << size_in_mega_bytes(vlc_vector<>(start_indices)) << endl;
     bit_vector starts_b(starts.size());
     for (unsigned int i = 0; i < starts.size(); i++) starts_b [i] = starts [i];
     cerr << "starts sd_vector: " << size_in_mega_bytes(sd_vector<>(starts_b)) << endl;
@@ -125,5 +133,5 @@ int main (const int argc, char* argv[]) {
     boost::filesystem::path orig_file = boost::filesystem::path(argv [2]);
     SR_index index(k);
     index.construct(orig_file.string());
-
+    int n;
 }
