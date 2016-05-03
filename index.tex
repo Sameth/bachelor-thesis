@@ -1,1 +1,70 @@
 \chapter{Indexácia $k$-nadslova}
+
+V predošlej kapitole sme si popísali, ako vieme nájsť $k$-nadslovo k nejakej
+množine reťazcov. V tejto kapitole si popíšeme rôzne typy dotazov, ktoré by
+sme chceli mať na tieto reťazce a ako ich vieme implementovať s pomocou
+nájdeného $k$-nadslova. Pripomíname, že všetky dotazy budú zisťovať nejakú
+informáciu o podreťazcoch, ktoré sú dlhé nanajvýš $k$.
+
+\section{Prítomnosť podreťazca}
+
+Úplne najzákladnejšou otázkou, na ktorú chceme vedieť odpovedať, je prítomnosť
+nejakého podreťazca dĺžky najviac $k$ vo vstupných reťazcoch. Ako sa neskôr ukáže,
+vedieť odpovedať na takýto dotaz nám neskôr pomôže vybudovať dodatočné podporné
+štruktúry, pomocou ktorých budeme vedieť odpovedať aj na zložitejšie dotazy.
+
+Ako prvé je dôležité všimnúť si, že prítomnosť nejakého reťazca v $k$-nadslove
+nám nezaručuje, že sa vyskytoval aj v nejakom z pôvodných reťazcov. Vezmime si
+napríklad $k = 4$ a dva reťazce, \texttt{ACGA} a \texttt{ACGT}. Ich $k$-nadslovom
+môže byť napríklad reťazec \texttt{ACGACGT}, ktorý napríklad obsahuje aj
+podreťazec \texttt{CGAC}, ktorý sa nevyskytuje ani v jednom z pôvodných reťazcov.
+
+Pre tento účel mierne modifikujeme algoritmus na hľadanie $k$-nadslova tak, aby nám
+vedel pre každý znak výsledného $k$-nadslova povedať, či sa ním končí nejaká $k$-tica,
+ktorá sa vyskytuje v niektorom pôvodnom reťazci. To docielime jednoducho tak, že
+pre každú hranu, ktorú budeme mať v našom grafe, si zapamätáme, či reprezentuje
+nutnú hranu, inými slovami povedané, či sa $k$-tica, ktorú reprezentuje, vyskytuje
+v niektorom zo vstupných reťazcov.
+
+Pri prepisovaní sledu na konkrétny reťazec si budeme zároveň vytvárať pole
+pravdivostných hodnôt, do ktorého pre každý znak, ktorý pripisujeme na koniec
+generovaného $k$-nadslova, uložíme hodnotu $Pravda$, ak práve pridávaný znak
+prichádza z nutnej hrany. Prvých $k-1$ znakov, preklad prvého vrchola, dostane
+hodnotu $Pravda$, keďže každý vrchol predstavuje $k-1$-ticu znakov, ktorá sa
+nachádzala v niektorom vstupnom slove. Toto pole budeme nazývať \emph{poľom výskytov}.
+
+Nakoniec potrebujeme pre každý dotazovaný podreťazec, kde sa nachádza v $k$-nadslove.
+Pre tento účel využijeme štruktúru FM-index \cite{fm_index}, konkrétne jeho implementáciu
+z knižnice SDSL \cite{sdsl}. Pomocou FM-indexu vieme zistiť, kde sa začínajú všetky
+výskyty nejakého podreťazca v $k$-nadslove v krátkom čase aj napriek tomu, že
+zaberá iba málo pamäte.
+
+Na dotazovaný reťazec $r$ teda nájdeme všetky jeho začiatky v $k$-nadslove. Ak
+v poli výskytov nájdeme aspoň pre jeden koniec výskytu hodnotu $Pravda$, odpovieme
+tiež $Pravda$, v opačnom prípade odpovieme $Nepravda$.
+
+\section{Počet výskytov podreťazca}
+
+Podobne, ako zisťovanie prítomnosti nejakého podreťazca, môžeme vyriešiť aj podporu
+pre dotazy, koľkokrát sa daný podreťazec nachádza vo vstupných reťazcoch. Jediný rozdiel
+bude v tom, že si pre každú nutnú hranu budeme pamätať, koľkokrát sa vyskytovala jej
+zodpovedajúca $k$-tica písmen na vstupe, pre nepovinné hrany si budeme pamätať nulu.
+
+Taktiež podobne ako pri dotazoch na prítomnosť si pre každý znak v $k$-nadslove
+budeme pamätať jednu hodnotu -- koľko $k$-tic zo vstupu sa končí týmto znakom. Toto
+pole budeme ďalej nazývať poľom počtu výskytov.
+
+Spracovávanie dotazu potom vyzerá podobne, ako pri zisťovaní prítomnosti. Nájdeme
+si všetky výskyty dotazovaného reťazca v FM-indexe. Spomedzi týchto výskytov nás
+bude zaujímať ten, u ktorého poslednému znaku zodpovedá nenulové číslo
+v poli počtu výskytov a toto číslo vrátime ako odpoveď. 
+
+Keďže každú $k$-ticu pri konštruovaní
+reprezentujeme ako jednu nutnú hranu, práve jeden výskyt zodpovedá tejto hrane a
+je nenulový, ostatné musia byť nulové. Dôležité je však poznamenať, že takéto
+riešenie dotazu nemusí dávať správnu odpoveď pre dotazované reťazce kratšie ako $k$.
+
+Aby toto pole čísel nezaberalo oveľa viac pamäte, než samotný FM-index, uložíme
+si ho skomprimované v štruktúre, ktorá je implementovaná v SDSL \cite{sdsl}.
+Experimenty ukázali, že vhodne skomprimované pole zaberá zhruba toľko miesta,
+čo FM-index. 
