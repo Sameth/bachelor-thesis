@@ -68,9 +68,9 @@ void SR_index::construct(const string& fasta_file) {
     ifstream file_in(fasta_file, ifstream::in);
     string seq;
     vector <int> start_indices;
-    vector <bool> starts;
+    vector <bool> starts, valid_positions;
     int k = this -> k;
-    int max_read = 0;
+    int max_read = 100;
     while (file_in >> seq) {
         file_in >> seq;
         max_read = max(max_read, (int) seq.size());
@@ -93,14 +93,24 @@ void SR_index::construct(const string& fasta_file) {
                 exit(1);
             }
         }
+        vector <bool> validinread(max_read + 1, false); 
         sort (positions.begin(), positions.end());
         starts.push_back(true);
         start_indices.push_back(positions[0].first);
+        for (int i = positions [0].second; i < positions [0].second + k; i++) validinread [i] = true;
         for (int i = 1; i < positions.size(); i++) {
             if (start_indices.back() != positions [i].first) {
                 start_indices.push_back(positions [i].first);
                 starts.push_back(false);
+                bool last = false;
+                for (int i = 0; i <= max_read; i++) {
+                    if (validinread [i] != last) valid_positions.push_back(true);
+                    else valid_positions.push_back(false);
+                    last = validinread [i];
+                    validinread [i] = false;
+                }
             }
+            for (int j = positions [i].second; j < positions [i].second + k; j++) validinread [j] = true;
         }
     }
 
@@ -112,9 +122,11 @@ void SR_index::construct(const string& fasta_file) {
 
     cerr << "start_intervals number of elements: " << start_indices.size() << endl;
     cerr << "start_intervals vlc: " << size_in_mega_bytes(vlc_vector<>(start_indices)) << endl;
-    bit_vector starts_b(starts.size());
+    bit_vector starts_b(starts.size()), valid_positions_b(valid_positions.size());
     for (unsigned int i = 0; i < starts.size(); i++) starts_b [i] = starts [i];
+    for (unsigned int i = 0; i < valid_positions.size(); i++) valid_positions_b [i] = valid_positions [i];
     cerr << "starts sd_vector: " << size_in_mega_bytes(sd_vector<>(starts_b)) << endl;
+    cerr << "valid in read sd_vector: " << size_in_mega_bytes(sd_vector<>(valid_positions_b)) << endl;
 }
 
 int main (const int argc, char* argv[]) {
@@ -133,5 +145,4 @@ int main (const int argc, char* argv[]) {
     boost::filesystem::path orig_file = boost::filesystem::path(argv [2]);
     SR_index index(k);
     index.construct(orig_file.string());
-    int n;
 }
