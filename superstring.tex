@@ -21,27 +21,13 @@ problém hľadania najkratšieho $k$-nadslova $\mathcal{NP}$-ťažký.
 \section{$\mathcal{NP}$-ťažkosť problému}
 %##################################################################################
 
-Rozhodovacia verzia problému najkratšieho spoločného nadslova je pomocou redukcie
-z problému Hamiltonovskej cesty v orientovanom grafe s obmedzením na stupne vrcholov
-a následnej redukcie na tento pomocný problém z problému Hamiltonovskej cesty v jednoduchom
-grafe, $\mathcal{NP}$-úplný, pokiaľ je splnená aspoň jedna z nasledujúcich podmienok \cite{superstring}:
-\begin{itemize}
-    \item Veľkosť abecedy, nad ktorou máme zadané slovo je neobmedzená
-    \item Veľkosť abecedy je aspoň $2$ a existuje $h \ge 1$ také, že každý
-          vstupný reťazec má dĺžku $\lceil h \cdot log_2 (S) \rceil$, kde $S$
-          je celková dĺžka vstupných slov.
-\end{itemize}
+Základný problém, o ktorý sa budeme opierať, je hľadanie hamiltonovskej cesty
+v orientovanom grafe. Problém existencie hamiltonovskej cesty v orientovanom
+planárnom grafe je $\mathcal{NP}$-úplný, aj v prípade, že $\delta_I \leq 3$ a
+$\delta_O \leq 4$ \cite{np_hamilton}. Pre naše účely bude stačiť $\mathcal{NP}$-úplnosť
+aj na orientovaných grafoch s $\delta_I \leq 4$, ktoré nie sú planárne.
 
-Pokiaľ by sme vedeli efektívne riešiť rozhodovací problém najkratšieho $k$-nadslova,
-na vstupe s rovnako dlhými vstupnými reťazcami a $k$ rovným dĺžke týchto reťazcov by
-bolo riešenie zhodné s riešením rozhodovacieho problému najkratšieho spoločného nadslova.
-Preto ak by sme mali polynomiálny algoritmus, ktorý vie riešiť rozhodovací problém
-najkratšieho $k$-nadslova, mali by sme zároveň polynomiálny algoritmus riešiaci problém
-Hamiltonovskej cesty. Trieda takýchto vstupov spĺňa druhú zo spomenutých podmienok.
 
-Z toho vyplýva $\mathcal{NP}$-ťažkosť rozhodovacieho problému
-najkratšieho $k$-nadslova a tým pádom aj $\mathcal{NP}$-ťažkosť problému hľadania
-najkratšieho $k$-nadslova.
 
 %###############################################################################
 \section{Abstrakcia}
