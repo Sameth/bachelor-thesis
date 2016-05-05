@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
+#include <sdsl>
 
 #ifndef RETRIES
 #define RETRIES 100
@@ -16,6 +17,7 @@
 #endif
 
 using namespace std;
+using namespace sdsl;
 
 
 map<char, int_t> base_to_int = {{'A',0}, {'C',1}, {'G',2}, {'T',3}};
@@ -77,14 +79,17 @@ void Graph::load_edges(const string& fasta_file) {
         }
     }
     cerr << "read " << n << " reads" << endl;
+    long long edge_count = 0;
     file_in.close();
     this -> edges_for_euler.clear();
     this -> edges_for_euler.resize(number_of_vertices);
     for (int_t i = 0; i < number_of_vertices; i++) {
         for (auto v : edges [i]) {
+            edge_count++;
             this -> edges_for_euler[i].push_back(make_pair(v.first, v.second));
         }
     }
+    cerr << "Total number of edges: " << edge_count << endl;
 }
 
 /**
