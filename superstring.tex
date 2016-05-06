@@ -14,20 +14,78 @@ použitie rozumné predpoklady.
 Mohlo by sa zdať, že hľadanie $k$-nadslova je slabšou verziou problému hľadania
 spoločného nadslova, keďže ľubovoľné nadslovo nejakej množiny reťazcov bude zároveň
 $k$-nadslovom tejto množiny reťazcov a ľahko vidno, že naopak to neplatí.
-Ukazuje sa však, že rovnako, ako problém hľadania najkratšieho nadslova, je aj
-problém hľadania najkratšieho $k$-nadslova $\mathcal{NP}$-ťažký.
+
+Na druhú stranu, každé slovo dlhé $n > k$ vieme rozvinúť na $n - k + 1$ slov dlhých
+presne $k$ tak, že hľadané nadslovo ostane presne to isté. V ďalšej časti si zhrnieme
+a popíšeme zopár výsledkov o ťažkosti problému najkratšieho $k$-nadslova.
 
 %##################################################################################
-\section{$\mathcal{NP}$-ťažkosť problému}
+\section{Ťažkosť problému}
 %##################################################################################
 
-Základný problém, o ktorý sa budeme opierať, je hľadanie hamiltonovskej cesty
-v orientovanom grafe. Problém existencie hamiltonovskej cesty v orientovanom
-planárnom grafe je $\mathcal{NP}$-úplný, aj v prípade, že $\delta_I \leq 3$ a
-$\delta_O \leq 4$ \cite{np_hamilton}. Pre naše účely bude stačiť $\mathcal{NP}$-úplnosť
-aj na orientovaných grafoch s $\delta_I \leq 4$, ktoré nie sú planárne.
+\begin{defn}
+Pod pojmom \emph{rozhodovací problém $k$-nadslova} budeme rozumieť nasledovné:
+Pre danú množinu slov $S$, v ktorej každé slovo má dĺžku presne $k$,
+a dané $l$ zistiť, či existuje $k$-nadslovo množiny $S$ dlhé nanajvýš $l$.
+\end{defn}
 
+Najprv sa pozrieme na problém pre neobmedzenú abecedu. Keďže tento problém je
+vo svojej podstate rovnaký ako rozhodovací problém nadslova, môžeme využiť výsledky
+pre obyčajný problém nadslova: pre $k \leq 2$ je problém polynomiálne riešiteľný,
+pre $k \ge 3$ je $\mathcal{NP}$-úplný pomocou redukcie z problému hamiltonovskej
+kružnice v orientovanom grafe \cite{superstring}.
 
+Prvým krokom redukcie v článku Gallanta, Meiera a Storera je skonštruovať orientovaný
+graf s vopred určeným počiatočným aj koncovým vrcholom, v ktorom každý vrchol $V$
+okrem koncového spĺňa $\delta_O(V) > 1$. Pre daný orientovaný graf $G$ vieme
+skonštruovať nový graf napríklad rozdelením niektorého vrchola na počiatočný vrchol $s$ a
+koncový vrchol $t$ tak, že počiatočný si zachová všetky vychádzajúce a koncový
+všetky vchádzajúce hrany. Pre dodržanie veľkosti stupňa pridáme ešte tri vrcholy
+$t', a, b$, pridáme hrany z každého vrchola do $t'$ a navyše hrany $(t, a), (t, b),
+(a, b), (b, a), (a, t')$. Tento nový graf obsahuje hamiltonovskú cestu práve vtedy,
+keď graf $G$ obsahuje hamiltonovskú kružnicu.
+
+Druhým krokom redukcie je skonštruovať z upraveného grafu množinu slov. Abecedu
+týchto slov definujú ako $\Sigma = V \cup B \cup S$, kde $V$ sú vrcholy grafu označené
+číslami od $1$ po $n$ ($1$ je počiatočný a $n$ koncový vrchol), $B = \{ \bar{v} | v \in V \}$
+je množina označených vrcholov a $S = \{\#, \$, \% \}$. 
+
+%TODO!!1!
+
+\subsection{Obmedzená veľkosť abecedy}
+
+S obmedzenou veľkosťou abecedy $\Sigma$ je náročné hovoriť o ťažkosti problému, keďže
+slov dĺžky $k$ nad obmedzene veľkou abecedou je konečne veľa. Za dobrý odhad
+ťažkosti problému však považujeme také číslo $n$, že pomocou rozhodovacieho
+problému $k$-nadslova vieme rozhodovať aj ľubovoľnú inštanciu problému
+hamiltonovskej cesty s nanajvýš $n$ vrcholmi.
+
+Dôležitou vlastnosťou konštrukcie
+inštancie rozhodovacieho problému nadslova z inštancie problému orientovanej
+hamiltonovskej cesty je, že stačí, aby každý reťazec mal dĺžku $3$. Ďalšou dobrou
+vlastnosťou je, že konštrukcia používa $(2n + 2)$-znakovú abecedu.
+
+Pri probléme s obmedzenou abecedou si teda vieme vystačiť s vhodným zakódovaním
+ľubovoľnej abecedy $\Sigma_V$ do obmedzene veľkej abecedy $\Sigma_M$. Jediná vec, ktorú potrebujeme zaručiť
+je, že v $k$-nadslove sa nebudú kódy jednotlivých znakov prekrývať. Inštanciu
+problému s neobmedzenou abecedou potom vieme prekódovať do inštancie s obmedzenou
+abecedou a z každého $k$-nadslovu nájdeného v inštancii s obmedzenou abecedou
+vieme zrekonštruovať $k$-nadslovo pre pôvodnú inštanciu.
+
+Pre jednoduchosť budeme uvažovať iba $k$ deliteľné tromi. Pre ostatné $k$ sa
+potom dá použiť podobná konštrukcia z inštancie problému orietovanej hamiltonovskej cesty,
+kde je graf ešte navyše bipartitný. Všetky kódovania budeme konštruovať tak, aby
+každému znaku z pôvodnej abecedy zodpovedalo rovnako dlhé slovo z obmedzenej abecedy.
+
+Ako prvý si rozoberieme prípad, kde $|\Sigma_M| = n \ge 3$. Bez ujmy na všeobecnosti,
+nech $\Sigma = \{0, 1, \ldots, n-1, \$ \}$. Znaky v abecede $\Sigma_V$ si očíslujeme
+číslami od $0$ po $|\Sigma_V| - 1$. Ako kód $i$-teho znaku použijeme reťazec
+$x \$ $, kde $x$ je číslo $i$ zapísané v $(n-1)$-tkovej sústave, doplnené nulami tak,
+aby malo dĺžku presne $\frac{k}{3} - 1$. Keďže sa každý znak končí zarážkou nepoužitou na
+inom mieste v kóde, kódy jednotlivých znakov sa nemôžu prekrývať.
+
+Pri uvedenom kódovaní má každý kód pôvodného znaku dĺžku presne $\frac{k}{3}$ a každé
+slovo pri konštrukcii inštancie problému $k$-nadslova pri 
 
 %###############################################################################
 \section{Abstrakcia}
