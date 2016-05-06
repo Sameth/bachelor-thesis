@@ -67,4 +67,16 @@ riešenie dotazu nemusí dávať správnu odpoveď pre dotazované reťazce krat
 Aby toto pole čísel nezaberalo oveľa viac pamäte, než samotný FM-index, uložíme
 si ho skomprimované v štruktúre, ktorá je implementovaná v SDSL \cite{sdsl}.
 Experimenty ukázali, že vhodne skomprimované pole zaberá zhruba toľko miesta,
-čo FM-index. 
+čo FM-index.
+
+\section{Čítania s podreťazcom}
+
+Posledný typ dotazu, na ktorý sa pozrieme, bude pre daný podreťazec zistiť, v
+ktorých čítaniach sa nachádza. Ako uvidíme neskôr, podobne budeme vedieť zistiť
+aj to, kde sa v daných čítaniach nachádzal.
+
+Základnou myšlienkou nášho riešenia je, podobne ako v CR-indexe, uložiť si
+začiatky jednotlivých čítaní. Keďže sa rôzne $k$-tice z čítania môžu nachádzať
+na rôznych miestach, pre každé čítanie môžeme mať týchto počiatočných pozícií viacero.
+Keď si nejaké konkrétne čítanie priložíme na nejakú pozíciu v $k$-nadslove,
+nie všetky jeho znaky sa budú zhodovať s nadslovom.
