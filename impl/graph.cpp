@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
-#include <sdsl>
+//#include <sdsl>
 
 #ifndef RETRIES
 #define RETRIES 100
@@ -17,7 +17,7 @@
 #endif
 
 using namespace std;
-using namespace sdsl;
+//using namespace sdsl;
 
 
 map<char, int_t> base_to_int = {{'A',0}, {'C',1}, {'G',2}, {'T',3}};
@@ -79,17 +79,18 @@ void Graph::load_edges(const string& fasta_file) {
         }
     }
     cerr << "read " << n << " reads" << endl;
-    long long edge_count = 0;
     file_in.close();
     this -> edges_for_euler.clear();
     this -> edges_for_euler.resize(number_of_vertices);
     for (int_t i = 0; i < number_of_vertices; i++) {
         for (auto v : edges [i]) {
-            edge_count++;
-            this -> edges_for_euler[i].push_back(make_pair(v.first, v.second));
+            this -> edges_for_euler[i].push_back(this->primitive_edges);
+            this -> edge_dest.push_back(v.first);
+            this -> edge_count.push_back(v.second);
+            this -> primitive_edges ++;
         }
     }
-    cerr << "Total number of edges: " << edge_count << endl;
+    cerr << "Total number of edges: " << this->primitive_edges << endl;
 }
 
 /**
@@ -107,8 +108,8 @@ int_t Graph::count_distance(int_t v1, int_t v2) {
         label1 &= scope;
         label2 >>= 2;
     }
-    assert(false);
-    return -1;
+    cerr << "No overlap reached\n";
+    exit(1);
 }
 
 /**
@@ -129,6 +130,58 @@ int_t Graph::count_score(vector <pair <int_t, bool> >& assignment) {
         }
     }
     return score;
+}
+
+int Graph::find_edge(int from, int to) {
+    for (int e : edges_for_euler [from]) {
+        if (edge_dest [e] == to) return e;
+    }
+    cerr << "edge not found\n";
+    exit(1);
+}
+
+void Graph::adjoin_edges(const string& fasta_file) {
+    vector <vector <int> > reverse_edges(this -> number_of_vertices);
+    for (int i = 0; i < this -> number_of_vertices; i++) {
+        for (int e : edges_for_euler [i]) {
+            reverse_edges [edge_dest [e]].push_back(i);
+        }
+    }
+
+    ifstream file_in(fasta_file, ifstream::in);
+    string seq;
+    vector <vector <pair <int, int> > > edge_graph(primitive_edges);
+
+    int internal_vertex_count = 0;
+    map <int_t, int> mapper;
+    while (file_in >> seq) {
+        file_in >> seq;
+        vector <int_t> encoded = encode(seq, this -> k - 1);
+        if (mapper.count(encoded [0]) == 0) {
+            mapper [encoded [0]] = internal_vertex_count;
+            internal_vertex_count++;
+        }
+        if (mapper.count(encoded [1]) == 0) {
+            mapper [encoded [1]] = internal_vertex_count;
+            internal_vertex_count++;
+        }
+        int oldvertex = mapper [encoded [1]], oldedge = find_edge(mapper [encoded [0]], mapper [encoded [1]]);
+        for (int i = 2; i < (int) encoded.size(); i++) {
+            if (mapper.count(encoded [i]) == 0) {
+                mapper [encoded [i]] = internal_vertex_count;
+                internal_vertex_count ++;
+            }
+            int newedge = find_edge(oldvertex, mapper [encoded [i]]), edgepos = 0;
+            while (edgepos < edge_graph [oldedge].size() && edge_graph [oldedge][edgepos].first != newedge) edgepos ++;
+            if (edgepos == edge_graph [oldedge].size()) edge_graph[oldedge].push_back(make_pair(newedge, 1));
+            else edge_graph[oldedge][edgepos].second ++;
+            oldvertex = mapper [encoded [i]];
+            oldedge = newedge;
+        }
+    }
+    cerr << "edge_graph created" << endl;
+    int n = 0;
+    while (true) n++;
 }
 
 /**
@@ -156,7 +209,10 @@ void Graph::random_assignment(vector <pair <int_t, bool> >& bad_vertices) {
         while (false_ < best.size() && best [false_].second) false_ ++;
         while (true_ < best.size() && !best [true_].second) true_ ++;
         if (false_ < best.size()) {
-            this -> edges_for_euler [best [false_].first].push_back(make_pair(best [true_].first, 0));
+            this -> edges_for_euler [best [false_].first].push_back(this-> primitive_edges);
+            edge_dest.push_back(best [true_].first);
+            edge_count.push_back(0);
+            this->primitive_edges ++;
             false_ ++;
             true_ ++;
         }
@@ -191,12 +247,12 @@ void Graph::connect_components() {
 //    vector <pair <int_t, bool> > unsatisfied_vertices;
     vector <bool> visited(number_of_vertices, false);
     srand (time(NULL) + getpid());
-    vector <vector <int_t> > reverse_edges(number_of_vertices);
+    vector <vector <int> > reverse_edges(number_of_vertices);
 
     // Construct reverse edges for the dfs
     for (int_t i = 0; i < number_of_vertices; i++) {
-        for(pair <int_t, int> edge : edges_for_euler [i]) {
-            reverse_edges [edge.first].push_back(i);
+        for(int edge : edges_for_euler [i]) {
+            reverse_edges [edge_dest [edge]].push_back(i);
         }
     }
 
@@ -205,25 +261,25 @@ void Graph::connect_components() {
         if (!visited [i]) {
 //            vector <pair <int_t, bool> > new_unsatisfied_vertices;
 
-            stack<int_t> buffer;
+            stack<int> buffer;
             visited [i] = true;
             buffer.push(i);
             
             // DFS
             while (!buffer.empty()) {
-                int_t v = buffer.top();
+                int v = buffer.top();
                 buffer.pop();
 
                 // Normal edges
-                for (pair <int_t, int> edge : edges_for_euler [v]) {
-                    if (!visited [edge.first]) {
-                        visited [edge.first] = true;
-                        buffer.push(edge.first);
+                for (int edge : edges_for_euler [v]) {
+                    if (!visited [edge_dest [edge]]) {
+                        visited [edge_dest [edge]] = true;
+                        buffer.push(edge_dest [edge]);
                     }
                 }
 
                 // Reverse edges
-                for (int_t new_v : reverse_edges [v]) {
+                for (int new_v : reverse_edges [v]) {
                     if (!visited [new_v]) {
                         visited [new_v] = true;
                         buffer.push(new_v);
@@ -232,7 +288,12 @@ void Graph::connect_components() {
             }
             
             // Connect
-            if (last_begin != -1ull) edges_for_euler [last_begin].push_back(make_pair(i, 0));
+            if (last_begin != -1ull) {
+                edges_for_euler [last_begin].push_back(this->primitive_edges);
+                edge_count.push_back(0);
+                edge_dest.push_back(i);
+                this -> primitive_edges ++;
+            }
             last_begin = i;
         }
     }
@@ -240,10 +301,6 @@ void Graph::connect_components() {
 
 void Graph::construct_edges_for_euler() {
 
-    // First, collapse set into a vector (we might need duplicates).
-
-    // Connect all the components (in unoriented sense)
-    this -> connect_components();
 
     // Next, count bad vertices (outdegree != indegree);
     // second value is true iff outdegree > indegree
@@ -252,8 +309,8 @@ void Graph::construct_edges_for_euler() {
     vector <int> degreecount (number_of_vertices, 0);
     for (int_t i = 0; i < number_of_vertices; i++) {
         degreecount [i] += this -> edges_for_euler [i].size();
-        for (pair<int_t, int> edge : this -> edges_for_euler [i]) {
-            degreecount [edge.first] --;
+        for (int edge : this -> edges_for_euler [i]) {
+            degreecount [edge_dest [edge]] --;
         }
     }
 
@@ -273,34 +330,40 @@ void Graph::construct_edges_for_euler() {
     cerr << "assignment problem size: " << bad_vertices.size() << endl;
     // Add edges so that the graph is eulerian.
     this->random_assignment(bad_vertices);
+    // Connect all the components (in unoriented sense)
+    this -> connect_components();
 }
 
 vector <int> Graph::path_counts() {
+    vector <int> result_counts(1, -1000);
+    for (int edge : this -> result_edges) {
+        result_counts.push_back(edge_count [edge]);
+    }
     return result_counts;
 }
 
-void Graph::euler_recursive(int_t v, vector <int_t>& result, int previous_count) {
+void Graph::euler_recursive(int_t v, vector <int>& result, int previous_edge) {
     while (!edges_for_euler[v].empty()) {
-        pair<int_t, int> next = edges_for_euler [v].back();
+        int next = edges_for_euler [v].back();
         edges_for_euler[v].pop_back();
-        euler_recursive(next.first, result, next.second);
+        euler_recursive(edge_dest [next], result, next);
     }
-    result.push_back(v);
-    this->result_counts.push_back(previous_count);
+    result.push_back(previous_edge);
 }
 
 vector <int_t> Graph::euler_path() {
     this -> construct_edges_for_euler();
-    vector <int_t> result;
 
     cerr << "begin recursive euler" << endl;
-    euler_recursive(0, result, -1);
-    reverse(result.begin(), result.end());
-    reverse(result_counts.begin(), result_counts.end());
+    euler_recursive(0, this->result_edges, -1);
+    result_edges.pop_back();
+    reverse(this -> result_edges.begin(), this -> result_edges.end());
+//    reverse(result_counts.begin(), result_counts.end());
     vector <int_t> decompressed_result;
 
-    for (int_t v : result) {
-        decompressed_result.push_back(label_decompress [v]);
+    decompressed_result.push_back(label_decompress[0]);
+    for (int edge : this -> result_edges) {
+        decompressed_result.push_back(label_decompress [edge_dest [edge]]);
     }
     cerr << "finish\n";
     return decompressed_result;

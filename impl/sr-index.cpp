@@ -49,6 +49,7 @@ string decode(vector <int_t> superstring, int k, vector <int> path_counts, vecto
 void SR_index::construct_superstring(const string& fasta_file) {
     Graph g(this -> k);
     g.load_edges(fasta_file);
+    g.adjoin_edges(fasta_file);
 
     vector <int_t> result_ints = g.euler_path();
     vector <int> result_counts = g.path_counts();
@@ -59,6 +60,11 @@ void SR_index::construct_superstring(const string& fasta_file) {
     
     this -> counts = vlc_vector<>(string_counts);
     cerr << fm_index.size() << ' ' << counts.size() << endl;
+/*    cerr << "superstring: " << extract(fm_index, 0, fm_index.size() - 1) << endl;
+    for (int v : string_counts) {
+        cerr << v << ' ';
+    }
+    cerr << endl; */
 }
 
 void SR_index::construct(const string& fasta_file) {
