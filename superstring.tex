@@ -36,21 +36,29 @@ pre $k \ge 3$ je $\mathcal{NP}$-úplný pomocou redukcie z problému hamiltonovs
 kružnice v orientovanom grafe \cite{superstring}.
 
 Prvým krokom redukcie v článku Gallanta, Meiera a Storera je skonštruovať orientovaný
-graf s vopred určeným počiatočným aj koncovým vrcholom, v ktorom každý vrchol $V$
-okrem koncového spĺňa $\delta_O(V) > 1$. Pre daný orientovaný graf $G$ vieme
-skonštruovať nový graf napríklad rozdelením niektorého vrchola na počiatočný vrchol $s$ a
+graf $G'$ s vopred určeným počiatočným aj koncovým vrcholom, v ktorom každý vrchol $V$
+okrem koncového spĺňa $\delta_O(V) > 1$. Pre daný orientovaný graf $G$
+skonštruujú nový graf rozdelením niektorého vrchola na počiatočný vrchol $s$ a
 koncový vrchol $t$ tak, že počiatočný si zachová všetky vychádzajúce a koncový
-všetky vchádzajúce hrany. Pre dodržanie veľkosti stupňa pridáme ešte tri vrcholy
-$t', a, b$, pridáme hrany z každého vrchola do $t'$ a navyše hrany $(t, a), (t, b),
-(a, b), (b, a), (a, t')$. Tento nový graf obsahuje hamiltonovskú cestu práve vtedy,
+všetky vchádzajúce hrany. Pre dodržanie veľkosti stupňa pridajú ešte tri vrcholy
+$t', a, b$, pridajú hrany z každého vrchola do $t'$ a navyše hrany $(t, a), (t, b),
+(a, b), (b, a), (a, t')$. Tento nový graf $G'$ obsahuje hamiltonovskú cestu práve vtedy,
 keď graf $G$ obsahuje hamiltonovskú kružnicu.
 
 Druhým krokom redukcie je skonštruovať z upraveného grafu množinu slov. Abecedu
 týchto slov definujú ako $\Sigma = V \cup B \cup S$, kde $V$ sú vrcholy grafu označené
 číslami od $1$ po $n$ ($1$ je počiatočný a $n$ koncový vrchol), $B = \{ \bar{v} | v \in V \}$
-je množina označených vrcholov a $S = \{\#, \$, \% \}$. 
+je množina označených vrcholov a $S = \{\#, \$, \% \}$.
 
-%TODO!!1!
+Ďalej skonštruujú množinu slov prislúchajúcich hranám vrchola $v$ ako
+$A_v = \{ \bar{v}w_i\bar{v} | w_i \in R_v\} \cup \{ w_i \bar{v} w_{i \oplus 1} | w_i \in R_v\}$,
+kde $R_v$ je postupnosť hrán vychádzajúcich z $v$ a $\oplus$ je sčítanie modulo $\delta_O(v)$.
+Nakoniec skonštruujú množiny $C = \{ \bar{v} \# v | v \in V\}$ a $T = \{ \% \# \bar{1}, \bar{n} \# \$\}$.
+Nakoniec v článku dokážu, že graf $G'$ obsahuje hamiltonovskú cestu práve vtedy, keď
+existuje nadslovo množiny slov $C \cup T \cup (\bigcup\limits_{v \in V} A_v)$.
+
+Dôležitou vlastnosťou tejto konštrukcie je, že stačí, aby každý reťazec mal dĺžku $3$. Ďalšou dobrou
+vlastnosťou je, že konštrukcia používa $(2n + 10)$-znakovú abecedu.
 
 \subsection{Obmedzená veľkosť abecedy}
 
@@ -58,12 +66,7 @@ S obmedzenou veľkosťou abecedy $\Sigma$ je náročné hovoriť o ťažkosti pr
 slov dĺžky $k$ nad obmedzene veľkou abecedou je konečne veľa. Za dobrý odhad
 ťažkosti problému však považujeme také číslo $n$, že pomocou rozhodovacieho
 problému $k$-nadslova vieme rozhodovať aj ľubovoľnú inštanciu problému
-hamiltonovskej cesty s nanajvýš $n$ vrcholmi.
-
-Dôležitou vlastnosťou konštrukcie
-inštancie rozhodovacieho problému nadslova z inštancie problému orientovanej
-hamiltonovskej cesty je, že stačí, aby každý reťazec mal dĺžku $3$. Ďalšou dobrou
-vlastnosťou je, že konštrukcia používa $(2n + 2)$-znakovú abecedu.
+hamiltonovskej kružnice s nanajvýš $n$ vrcholmi.
 
 Pri probléme s obmedzenou abecedou si teda vieme vystačiť s vhodným zakódovaním
 ľubovoľnej abecedy $\Sigma_V$ do obmedzene veľkej abecedy $\Sigma_M$. Jediná vec, ktorú potrebujeme zaručiť
@@ -84,8 +87,13 @@ $x \$ $, kde $x$ je číslo $i$ zapísané v $(n-1)$-tkovej sústave, doplnené 
 aby malo dĺžku presne $\frac{k}{3} - 1$. Keďže sa každý znak končí zarážkou nepoužitou na
 inom mieste v kóde, kódy jednotlivých znakov sa nemôžu prekrývať.
 
-Pri uvedenom kódovaní má každý kód pôvodného znaku dĺžku presne $\frac{k}{3}$ a každé
-slovo pri konštrukcii inštancie problému $k$-nadslova pri 
+Pri uvedenom kódovaní má každý kód pôvodného znaku dĺžku presne $\frac{k}{3}$. Keďže
+konštrukcia inštancie problému nadslova k inštancii problému orientovanej hamiltonovskej
+kružnice používa iba slová dĺžky $3$, všetky slová, ktoré vygenerujeme v našom kódovaní,
+budú mať dĺžku $k$. Keďže zakódovať vieme nanajvýš $(n-1)^{\frac{k}{3} - 1}$ rôznych
+vrcholov, pre dané $k$ vieme problém orientovanej hamiltonovskej cesty s nanajvýš
+$\frac{(n-1)^{\frac{k}{3}-1} - 10}{2}$ vrcholmi zredukovať na problém hľadania
+najkratšieho $k$-nadslova reťazcov nad $n$-znakovou abecedou.
 
 %###############################################################################
 \section{Abstrakcia}
@@ -94,9 +102,8 @@ slovo pri konštrukcii inštancie problému $k$-nadslova pri
 Po zdôvodnení a dokázaní ťažkosti riešeného problému sa pozrieme na spôsob, akým ho budeme
 riešiť. Ako prvé si objasníme abstrakciu problému, na ktorej postavíme celé riešenie.
 
-Podobne ako pri dokazovaní ťažkosti problému si pomôžeme grafovou teóriou. Celú
-sadu vstupných slov si budeme reprezentovať ako mierne upravený ohodnotený de Bruijnov graf stupňa $k - 1$ nad
-abecedou $\{A, C, G, T\}$. Každej hrane symbolicky priradíme reťazec, ktorého dĺžka bude
+Sadu vstupných slov si budeme reprezentovať ako mierne upravený ohodnotený de Bruijnov graf stupňa $k - 1$ nad
+abecedou $\Sigma$. Každej hrane symbolicky priradíme reťazec, ktorého dĺžka bude
 vždy zároveň hodnotou hrany.
 Naše riešenie, čiže nejaké spoločné $k$-nadslovo, budeme reprezentovať ako sled v tomto grafe.
 
