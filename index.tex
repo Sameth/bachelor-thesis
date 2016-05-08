@@ -80,3 +80,17 @@ začiatky jednotlivých čítaní. Keďže sa rôzne $k$-tice z čítania môžu
 na rôznych miestach, pre každé čítanie môžeme mať týchto počiatočných pozícií viacero.
 Keď si nejaké konkrétne čítanie priložíme na nejakú pozíciu v $k$-nadslove,
 nie všetky jeho znaky sa budú zhodovať s nadslovom.
+
+Informáciu o tom, ktoré pozície čítania sa zhodujú s nadslovom, si budeme ukladať
+do jedného poľa pravdivostných hodnôt. Pre jednoduchosť budeme predpokladať, že
+každé čítanie má rovnakú dĺžku, $q$. Najprv si predstavme, že pre každý začiatok nejakého prekryvu si
+vyhradíme $q$ hodnôt, každá označujúc, či sa znak na zodpovedajúcom mieste zhoduje.
+
+Keďže však existuje komprimované poľe pravdivostných hodnôt,
+ktorého veľkosť je úmerná počtu hodnôt $Pravda$, namiesto ukladania jednotiek
+si budeme na každý začiatok súvislého úseku hodnôt $Pravda$ ukladať iba jednu takúto
+hodnotu, za koniec si uložíme druhú. Na zistenie toho, či nejaká pozícía zodpovedá
+prekryvu nám potom stačí zistiť, aká je parita počtu hodnôt $Pravda$ od tohto miesta
+doľava, párny počet znamená nezhodu, nepárny zhodu.
+
+
