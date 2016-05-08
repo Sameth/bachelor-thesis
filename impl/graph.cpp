@@ -140,11 +140,24 @@ int Graph::find_edge(int from, int to) {
     exit(1);
 }
 
+void Graph::remove_edge(int from, int edge_number) {
+    for (int i = 0; i < edges_for_euler [from].size(); i++) {
+        if (edges_for_euler [from] [i] == edge_number) {
+            swap(edges_for_euler [from] [i], edges_for_euler [from].back());
+            edges_for_euler [from].pop_back();
+            return;
+        }
+    }
+    cerr << "edge not found\n";
+    exit(1);
+}
+
 void Graph::adjoin_edges(const string& fasta_file) {
+    cerr << "adjoining edges\n";
     vector <vector <int> > reverse_edges(this -> number_of_vertices);
     for (int i = 0; i < this -> number_of_vertices; i++) {
         for (int e : edges_for_euler [i]) {
-            reverse_edges [edge_dest [e]].push_back(i);
+            reverse_edges [edge_dest [e]].push_back(e);
         }
     }
 
@@ -180,8 +193,99 @@ void Graph::adjoin_edges(const string& fasta_file) {
         }
     }
     cerr << "edge_graph created" << endl;
-    int n = 0;
-    while (true) n++;
+    int sumscore = 0;
+    vector <int> next_edge(primitive_edges, -1);
+    vector <bool> has_previous(primitive_edges, false);
+    for (int i = 0; i < number_of_vertices; i++) {
+        vector <int> left_edges = reverse_edges [i];
+        vector <int> right_edges = edges_for_euler [i];
+        vector <int> best_edges;
+        int bestscore = -1;
+        if (left_edges.size() >= right_edges.size()) {
+            sort(left_edges.begin(), left_edges.end());
+            
+            do {
+                int curscore = 0;
+                for (int j = 0; j < (int) right_edges.size(); j++) {
+                    for (int l = 0; l < edge_graph [left_edges [j]].size(); l++) {
+                        if (edge_graph [left_edges [j]] [l].first == right_edges [j]) {
+                            curscore += edge_graph [left_edges [j]] [l].second;
+                            break;
+                        }
+                    }
+                }
+                if (curscore > bestscore) {
+                    best_edges = left_edges;
+                    bestscore = curscore;
+                }
+            } while (next_permutation(left_edges.begin(), left_edges.end()));
+
+            for (int j = 0; j < (int) right_edges.size(); j++) {
+                for (int l = 0; l < edge_graph [best_edges [j]].size(); l++) {
+                    if (edge_graph [best_edges [j]] [l].first == right_edges [j]) {
+                        next_edge [best_edges [j]] = right_edges [j];
+                        has_previous [right_edges [j]] = true;
+                        sumscore += edge_graph [best_edges [j]] [l].second;
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            sort(right_edges.begin(), right_edges.end());
+
+            do {
+                int curscore = 0;
+                for (int j = 0; j < (int) left_edges.size(); j++) {
+                    for (int l = 0; l < edge_graph [left_edges [j]].size(); l++) {
+                        if (edge_graph [left_edges [j]] [l].first == right_edges [j]) {
+                            curscore += edge_graph [left_edges [j]] [l].second;
+                            break;
+                        }
+                    }
+                }
+                if (curscore > bestscore) {
+                    best_edges = right_edges;
+                    bestscore = curscore;
+                }
+            } while (next_permutation(right_edges.begin(), right_edges.end()));
+            for (int j = 0; j < (int) left_edges.size(); j++) {
+                for (int l = 0; l < edge_graph [left_edges [j]].size(); l++) {
+                    if (edge_graph [left_edges [j]] [l].first == best_edges [j]) {
+                        next_edge [left_edges [j]] = best_edges [j];
+                        has_previous [best_edges [j]] = true;
+                        sumscore += edge_graph [left_edges [j]] [l].second;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    cerr << "edges concatenated\n";
+    int composite_edges = 1;
+    vector <int> reverse_dest(primitive_edges);
+    for (int i = 0; i < number_of_vertices; i++) {
+        for (int e : edges_for_euler [i]) {
+            reverse_dest [e] = i;
+        }
+    }
+
+    for (int i = 0; i < primitive_edges; i++) {
+        if (next_edge [i] >= 0 && !has_previous[i]) {
+            contained_edges.push_back(vector<int>());
+            int edge = i;
+            while (edge != -1) {
+                remove_edge(reverse_dest [edge], edge);
+                contained_edges.back().push_back(edge);
+                edge = next_edge[edge];
+                if (edge == i) edge = -1;
+            }
+            edges_for_euler [reverse_dest [i]].push_back(-composite_edges);
+            composite_edges ++;
+        }
+    }
+    
 }
 
 /**
@@ -238,6 +342,11 @@ void Graph::search(int_t v, vector <bool>& visited, vector <pair <int_t, bool> >
     }
 } */
 
+int Graph::edge_destination(int edge) {
+    if (edge >= 0) return edge_dest [edge];
+    else return edge_dest [contained_edges [-1 -edge].back()];
+}
+
 // TODO: Do something more intelligent (like: match vertex with outdegree > indegree
 // with a vertex with outdegree < indegree if possible)
 void Graph::connect_components() {
@@ -252,7 +361,7 @@ void Graph::connect_components() {
     // Construct reverse edges for the dfs
     for (int_t i = 0; i < number_of_vertices; i++) {
         for(int edge : edges_for_euler [i]) {
-            reverse_edges [edge_dest [edge]].push_back(i);
+            reverse_edges [edge_destination (edge)].push_back(i);
         }
     }
 
@@ -272,9 +381,11 @@ void Graph::connect_components() {
 
                 // Normal edges
                 for (int edge : edges_for_euler [v]) {
-                    if (!visited [edge_dest [edge]]) {
-                        visited [edge_dest [edge]] = true;
-                        buffer.push(edge_dest [edge]);
+                    if (edge >= 0) {
+                        if (!visited [edge_destination (edge)]) {
+                            visited [edge_destination (edge)] = true;
+                            buffer.push(edge_destination (edge));
+                        }
                     }
                 }
 
@@ -310,7 +421,7 @@ void Graph::construct_edges_for_euler() {
     for (int_t i = 0; i < number_of_vertices; i++) {
         degreecount [i] += this -> edges_for_euler [i].size();
         for (int edge : this -> edges_for_euler [i]) {
-            degreecount [edge_dest [edge]] --;
+            degreecount [edge_destination (edge)] --;
         }
     }
 
@@ -337,7 +448,9 @@ void Graph::construct_edges_for_euler() {
 vector <int> Graph::path_counts() {
     vector <int> result_counts(1, -1000);
     for (int edge : this -> result_edges) {
-        result_counts.push_back(edge_count [edge]);
+        for (int primitive_edge : list_edges(edge)) {
+            result_counts.push_back(edge_count [primitive_edge]);
+        }
     }
     return result_counts;
 }
@@ -346,9 +459,14 @@ void Graph::euler_recursive(int_t v, vector <int>& result, int previous_edge) {
     while (!edges_for_euler[v].empty()) {
         int next = edges_for_euler [v].back();
         edges_for_euler[v].pop_back();
-        euler_recursive(edge_dest [next], result, next);
+        euler_recursive(edge_destination (next), result, next);
     }
     result.push_back(previous_edge);
+}
+
+vector <int> Graph::list_edges(int edge) {
+    if (edge >= 0) return vector <int> (1, edge);
+    else return contained_edges [-1 -edge];
 }
 
 vector <int_t> Graph::euler_path() {
@@ -363,7 +481,9 @@ vector <int_t> Graph::euler_path() {
 
     decompressed_result.push_back(label_decompress[0]);
     for (int edge : this -> result_edges) {
-        decompressed_result.push_back(label_decompress [edge_dest [edge]]);
+        for (int primitive_edge : list_edges(edge)) {
+            decompressed_result.push_back(label_decompress [edge_dest [primitive_edge]]);
+        }
     }
     cerr << "finish\n";
     return decompressed_result;

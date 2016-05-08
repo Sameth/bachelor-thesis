@@ -60,6 +60,8 @@ void SR_index::construct_superstring(const string& fasta_file) {
     
     this -> counts = vlc_vector<>(string_counts);
     cerr << fm_index.size() << ' ' << counts.size() << endl;
+    cerr << "FM index size in mb: " << size_in_mega_bytes(fm_index) << endl;
+    cerr << "counts vector size in mb: " << size_in_mega_bytes(counts) << endl;
 /*    cerr << "superstring: " << extract(fm_index, 0, fm_index.size() - 1) << endl;
     for (int v : string_counts) {
         cerr << v << ' ';
