@@ -122,14 +122,17 @@ void SR_index::construct(const string& fasta_file) {
         }
     }
 
+    vector <int> start_indices_permutation(start_indices.size());
     for (int i = 0; i < start_indices.size(); i++) {
         start_indices [i] += max_read;
+        start_indices_permutation [i] = i;
     }
 
     file_in.close();
-
+    sort (start_indices_permutation.begin(), start_indices_permutation.end(), [&start_indices](int i1, int i2) {return start_indices [i1] < start_indices [i2];});
     cerr << "start_intervals number of elements: " << start_indices.size() << endl;
     cerr << "start_intervals vlc: " << size_in_mega_bytes(vlc_vector<>(start_indices)) << endl;
+    cerr << "start_indices_prtmutation vlc " << size_in_mega_bytes(vlc_vector<>(start_indices_permutation)) << endl;
     bit_vector starts_b(starts.size()), valid_positions_b(valid_positions.size());
     for (unsigned int i = 0; i < starts.size(); i++) starts_b [i] = starts [i];
     for (unsigned int i = 0; i < valid_positions.size(); i++) valid_positions_b [i] = valid_positions [i];

@@ -366,10 +366,10 @@ void Graph::connect_components() {
     }
 
     int_t last_begin = -1;
+    int total_connections = 0;
     for (int_t i = 0; i < number_of_vertices; i++) {
-        if (!visited [i]) {
+        if (!visited [i] && (reverse_edges[i].size() > 0 || edges_for_euler [i].size() > 0)) {
 //            vector <pair <int_t, bool> > new_unsatisfied_vertices;
-
             stack<int> buffer;
             visited [i] = true;
             buffer.push(i);
@@ -404,10 +404,12 @@ void Graph::connect_components() {
                 edge_count.push_back(0);
                 edge_dest.push_back(i);
                 this -> primitive_edges ++;
+                total_connections ++;
             }
             last_begin = i;
         }
     }
+    cerr << "Connected " << total_connections + 1 << "components\n";
 }
 
 void Graph::construct_edges_for_euler() {
