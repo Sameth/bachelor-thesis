@@ -1,5 +1,3 @@
-\chapter{Hľadanie nadslova}
-
 Problém, ktorý riešime v tejto práci sa dá rozdeliť na tri základné úrovne podľa toho,
 ako veľmi berieme do úvahy požadovanú funkcionalitu a povahu reálnych dát. Pôjde o:
 \begin{enumerate}
@@ -18,6 +16,7 @@ $k$-nadslovom tejto množiny reťazcov a ľahko vidno, že naopak to neplatí.
 Na druhú stranu, každé slovo dlhé $n > k$ vieme rozvinúť na $n - k + 1$ slov dlhých
 presne $k$ tak, že hľadané nadslovo ostane presne to isté. V ďalšej časti si zhrnieme
 a popíšeme zopár výsledkov o ťažkosti problému najkratšieho $k$-nadslova.
+
 
 %##################################################################################
 \section{Ťažkosť problému}
@@ -60,7 +59,9 @@ existuje nadslovo množiny slov $C \cup T \cup (\bigcup\limits_{v \in V} A_v)$.
 Dôležitou vlastnosťou tejto konštrukcie je, že stačí, aby každý reťazec mal dĺžku $3$. Ďalšou dobrou
 vlastnosťou je, že konštrukcia používa $(2n + 10)$-znakovú abecedu.
 
+%--------------------------------------------------------------------------------
 \subsection{Obmedzená veľkosť abecedy}
+%--------------------------------------------------------------------------------
 
 S obmedzenou veľkosťou abecedy $\Sigma$ je náročné hovoriť o ťažkosti problému, keďže
 slov dĺžky $k$ nad obmedzene veľkou abecedou je konečne veľa. Za dobrý odhad
@@ -226,9 +227,9 @@ Nakoniec si spomenieme ešte jednu peknú vlastnosť, ktorá sa nám bude hodiť
     $U$ s $V$ je najdlhší možný, $slovo(w)$ nám dáva návod, ako zostrojiť kratší.
 \end{proof}
 
-%##################################################################################
+%--------------------------------------------------------------------------------
 \subsection{Vlastnosti abstrakcie}
-%##################################################################################
+%--------------------------------------------------------------------------------
 
 Zatiaľčo každému korektnému sledu v abstrakcii prislúcha práve jedno $k$-nadslovo, nie
 každé $k$-nadslovo vieme reprezentovať ako sled v našom grafe.
@@ -363,9 +364,9 @@ krátkymi podreťazcami celého genómu s vysokou mierou pokrytia, je pomerne pr
 $k$-grafu týchto čítaní budú tvoriť stále súvislý graf, prípadne že budú obsahovať iba málo komponentov.
 Najprv sa teda pozrieme, ako hľadať $k$-nadslovo v súvislom $k$-grafe.
 
-%##################################################################################
+%--------------------------------------------------------------------------------
 \subsection{Súvislý graf}
-%##################################################################################
+%--------------------------------------------------------------------------------
 
 Problém čínskeho poštára sa zaoberá hľadaním najlacnejšieho sledu v grafe takého, že
 každou hranou prejde aspoň raz.
@@ -444,9 +445,9 @@ genetických čítaní, chceli by sme mať nejaký spôsob, ako v lineárnom ča
 pospájanie týchto vrcholov. V našom navrhovanom riešení jednoducho vyskúšame pevne stanovený počet
 náhodných priradení a vyberieme z nich to najlacnejšie.
 
-%##################################################################################
+%--------------------------------------------------------------------------------
 \subsection{Nesúvislý graf}
-%##################################################################################
+%--------------------------------------------------------------------------------
 
 Už na začiatku sme si dokázali, že hľadanie $k$-nadslova je $\mathcal{NP}$-ťažký problém. Keďže
 sme si popísali a zdôvodnili polynomiálny algoritmus, ktorý vie nájsť $k$-nadslovo pre súvislý
@@ -466,3 +467,4 @@ optimálnemu riešeniu. Ďalej vieme, že sme do grafu pridávali hrany najlacne
 tak, aby v každom vrchole platilo $\delta_I = \delta_I$. Keďže najväčšia možná hodnota
 hrany je $k-1$, znamená to, že riešenie, ktoré takto nájdeme, bude najviac o $(k - 1)(c - 1)$ drahšie
 ako optimálne, čiže takto nájdené $k$-nadslovo bude nanajvýš o toľko dlhšie od najkratšieho možného.
+
