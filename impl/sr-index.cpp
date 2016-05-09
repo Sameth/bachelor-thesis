@@ -78,10 +78,8 @@ void SR_index::construct(const string& fasta_file) {
     vector <int> start_indices;
     vector <bool> starts, valid_positions;
     int k = this -> k;
-    int max_read = 100;
     while (file_in >> seq) {
         file_in >> seq;
-        max_read = max(max_read, (int) seq.size());
         vector <pair <int, int> > positions;
         for (int i = 0; i <= (int) seq.size() - k; i++) {
             auto occs = locate(fm_index, seq.substr(i, k));
@@ -101,7 +99,7 @@ void SR_index::construct(const string& fasta_file) {
                 exit(1);
             }
         }
-        vector <bool> validinread(max_read + 1, false); 
+        vector <bool> validinread(max_read_length + 1, false); 
         sort (positions.begin(), positions.end());
         starts.push_back(true);
         start_indices.push_back(positions[0].first);
@@ -111,11 +109,11 @@ void SR_index::construct(const string& fasta_file) {
                 start_indices.push_back(positions [i].first);
                 starts.push_back(false);
                 bool last = false;
-                for (int i = 0; i <= max_read; i++) {
-                    if (validinread [i] != last) valid_positions.push_back(true);
+                for (int j = 0; j <= max_read_length; j++) {
+                    if (validinread [j] != last) valid_positions.push_back(true);
                     else valid_positions.push_back(false);
-                    last = validinread [i];
-                    validinread [i] = false;
+                    last = validinread [j];
+                    validinread [j] = false;
                 }
             }
             for (int j = positions [i].second; j < positions [i].second + k; j++) validinread [j] = true;
@@ -124,20 +122,83 @@ void SR_index::construct(const string& fasta_file) {
 
     vector <int> start_indices_permutation(start_indices.size());
     for (int i = 0; i < start_indices.size(); i++) {
-        start_indices [i] += max_read;
+        start_indices [i] += max_read_length;
         start_indices_permutation [i] = i;
     }
+    sort (start_indices_permutation.begin(), start_indices_permutation.end(), [&start_indices](int i1, int i2) {return start_indices [i1] < start_indices [i2];});
+
+    for (auto e : start_indices) {
+        cerr << e << ' ';
+    }
+    cerr << endl;
+
+    for (auto e : start_indices_permutation) {
+        cerr << e << ' ';
+    }
+    cerr << endl;
 
     file_in.close();
-    sort (start_indices_permutation.begin(), start_indices_permutation.end(), [&start_indices](int i1, int i2) {return start_indices [i1] < start_indices [i2];});
-    cerr << "start_intervals number of elements: " << start_indices.size() << endl;
-    cerr << "start_intervals vlc: " << size_in_mega_bytes(vlc_vector<>(start_indices)) << endl;
-    cerr << "start_indices_prtmutation vlc " << size_in_mega_bytes(vlc_vector<>(start_indices_permutation)) << endl;
+    cerr << "start_indices number of elements: " << start_indices.size() << endl;
+    this -> start_indices = vlc_vector<>(start_indices);
+    cerr << "start_indices vlc: " << size_in_mega_bytes(this -> start_indices) << endl;
+    this -> start_indices_permutation = vlc_vector<>(start_indices_permutation);
+    cerr << "start_indices_permutation vlc " << size_in_mega_bytes(this->start_indices_permutation) << endl;
     bit_vector starts_b(starts.size()), valid_positions_b(valid_positions.size());
     for (unsigned int i = 0; i < starts.size(); i++) starts_b [i] = starts [i];
     for (unsigned int i = 0; i < valid_positions.size(); i++) valid_positions_b [i] = valid_positions [i];
-    cerr << "starts sd_vector: " << size_in_mega_bytes(sd_vector<>(starts_b)) << endl;
-    cerr << "valid in read sd_vector: " << size_in_mega_bytes(sd_vector<>(valid_positions_b)) << endl;
+    this -> new_read_start = sd_vector<>(starts_b);
+    this -> read_start_rank = sd_vector<>::rank_1_type(&(this -> new_read_start));
+    cerr << "starts sd_vector: " << size_in_mega_bytes(this -> new_read_start) << endl;
+    this -> valid_in_read = sd_vector<>(valid_positions_b);
+    this -> valid_in_read_rank = sd_vector<>::rank_1_type(&(this -> valid_in_read));
+    cerr << "valid in read sd_vector: " << size_in_mega_bytes(this -> valid_in_read) << endl;
+}
+
+vector<int> SR_index::find_reads(const string& query) {
+    if (query.size() > k) {
+        cerr << "Query longer than k\n";
+        exit(1);
+    }
+    int the_position = -1;
+    vector <int> result;
+    for (auto pos : locate(fm_index, query)) {
+        if (counts [pos + query.size() - 1] > 1) {
+            the_position = pos;
+            break;
+        }
+    }
+
+    if (the_position == -1) {
+        cerr << "not in superstring\n";
+        return result;
+    }
+
+    int lower = -1, upper = start_indices_permutation.size();
+    while (upper - lower > 1) {
+        int middle = (upper + lower) / 2;
+        if (start_indices[start_indices_permutation[middle]]  < the_position + query.size() - 1) lower = middle;
+        else upper = middle;
+    }
+    cerr << upper << endl;
+    int current = upper;
+    set <int> results;
+    while (current < start_indices_permutation.size() && start_indices[start_indices_permutation[current]] - max_read_length <= the_position) {
+        int curstart = start_indices [start_indices_permutation[current]] - max_read_length;
+        int valid_in_read_offset = (max_read_length + 1) * start_indices_permutation [current];
+        cerr << start_indices_permutation [current] << ' ' << start_indices [start_indices_permutation [current]] << endl;
+
+        if ((valid_in_read_rank(valid_in_read_offset + the_position - curstart + 1) % 2) == 0 && (valid_in_read_rank(valid_in_read_offset + the_position - curstart + query.size() + 1) == valid_in_read_rank(valid_in_read_offset + the_position - curstart + 1))) {
+            results.insert(read_start_rank(start_indices_permutation [current] + 1));
+        }
+
+        current ++;
+    }
+
+    for (auto x : results) {
+        result.push_back(x);
+    }
+    return result;
+
 }
 
 int main (const int argc, char* argv[]) {
@@ -154,6 +215,13 @@ int main (const int argc, char* argv[]) {
     }
     int k = atol(argv [1]);
     boost::filesystem::path orig_file = boost::filesystem::path(argv [2]);
-    SR_index index(k);
+    SR_index index(k, 100);
     index.construct(orig_file.string());
+    string query;
+    while (cin >> query) {
+        for (auto x : index.find_reads(query)) {
+            cout << x << ' ';
+        }
+        cout << endl;
+    }
 }
