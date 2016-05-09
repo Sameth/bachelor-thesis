@@ -62,8 +62,8 @@ void SR_index::construct_superstring(const string& fasta_file) {
     cerr << fm_index.size() << ' ' << counts.size() << endl;
     cerr << "FM index size in mb: " << size_in_mega_bytes(fm_index) << endl;
     cerr << "counts vector size in mb: " << size_in_mega_bytes(counts) << endl;
-/*    cerr << "superstring: " << extract(fm_index, 0, fm_index.size() - 1) << endl;
-    for (int v : string_counts) {
+//    cerr << "superstring: " << extract(fm_index, 0, fm_index.size() - 1) << endl;
+/*    for (int v : string_counts) {
         cerr << v << ' ';
     }
     cerr << endl; */
@@ -118,6 +118,13 @@ void SR_index::construct(const string& fasta_file) {
             }
             for (int j = positions [i].second; j < positions [i].second + k; j++) validinread [j] = true;
         }
+        bool last = false;
+        for (int j = 0; j <= max_read_length; j++) {
+            if (validinread [j] != last) valid_positions.push_back(true);
+            else valid_positions.push_back(false);
+            last = validinread [j];
+            validinread [j] = false;
+        }
     }
 
     vector <int> start_indices_permutation(start_indices.size());
@@ -127,7 +134,7 @@ void SR_index::construct(const string& fasta_file) {
     }
     sort (start_indices_permutation.begin(), start_indices_permutation.end(), [&start_indices](int i1, int i2) {return start_indices [i1] < start_indices [i2];});
 
-    for (auto e : start_indices) {
+/*    for (auto e : start_indices) {
         cerr << e << ' ';
     }
     cerr << endl;
@@ -135,7 +142,7 @@ void SR_index::construct(const string& fasta_file) {
     for (auto e : start_indices_permutation) {
         cerr << e << ' ';
     }
-    cerr << endl;
+    cerr << endl;  */
 
     file_in.close();
     cerr << "start_indices number of elements: " << start_indices.size() << endl;
@@ -152,9 +159,10 @@ void SR_index::construct(const string& fasta_file) {
     this -> valid_in_read = sd_vector<>(valid_positions_b);
     this -> valid_in_read_rank = sd_vector<>::rank_1_type(&(this -> valid_in_read));
     cerr << "valid in read sd_vector: " << size_in_mega_bytes(this -> valid_in_read) << endl;
+    file_in.close();
 }
 
-vector<int> SR_index::find_reads(const string& query) {
+vector<int> SR_index::find_reads(const string& query, bool debug) {
     if (query.size() > k) {
         cerr << "Query longer than k\n";
         exit(1);
@@ -169,9 +177,10 @@ vector<int> SR_index::find_reads(const string& query) {
     }
 
     if (the_position == -1) {
-        cerr << "not in superstring\n";
         return result;
     }
+
+    if (debug) cerr << "THE position : " << the_position << endl;
 
     int lower = -1, upper = start_indices_permutation.size();
     while (upper - lower > 1) {
@@ -179,23 +188,23 @@ vector<int> SR_index::find_reads(const string& query) {
         if (start_indices[start_indices_permutation[middle]]  < the_position + query.size() - 1) lower = middle;
         else upper = middle;
     }
-    cerr << upper << endl;
     int current = upper;
+    if (debug) cerr << "First possible index: " << current << ' ' << start_indices [start_indices_permutation [current]] << ' ' << (int) start_indices [start_indices_permutation [current] ] - max_read_length << endl << "Zaciatok ";
     set <int> results;
-    while (current < start_indices_permutation.size() && start_indices[start_indices_permutation[current]] - max_read_length <= the_position) {
+    while (current < start_indices_permutation.size() && (int) start_indices[start_indices_permutation[current]] - max_read_length <= the_position) {
         int curstart = start_indices [start_indices_permutation[current]] - max_read_length;
         int valid_in_read_offset = (max_read_length + 1) * start_indices_permutation [current];
-        cerr << start_indices_permutation [current] << ' ' << start_indices [start_indices_permutation [current]] << endl;
-
-        if ((valid_in_read_rank(valid_in_read_offset + the_position - curstart + 1) % 2) == 0 && (valid_in_read_rank(valid_in_read_offset + the_position - curstart + query.size() + 1) == valid_in_read_rank(valid_in_read_offset + the_position - curstart + 1))) {
+        if (debug) cerr << start_indices_permutation[current];
+        if ((valid_in_read_rank(valid_in_read_offset + the_position - curstart + 1) % 2) == 1 && (valid_in_read_rank(valid_in_read_offset + the_position - curstart + query.size()) == valid_in_read_rank(valid_in_read_offset + the_position - curstart + 1))) {
             results.insert(read_start_rank(start_indices_permutation [current] + 1));
         }
 
         current ++;
     }
+    if(debug) cerr << endl;
 
     for (auto x : results) {
-        result.push_back(x);
+        result.push_back(x - 1);
     }
     return result;
 
@@ -207,6 +216,7 @@ int main (const int argc, char* argv[]) {
         cout << usage << endl;
         return 1;
     }
+    cerr << vector <int>().max_size() << endl;
     struct rlimit stack_limit;
     getrlimit(RLIMIT_STACK, &stack_limit);
     stack_limit.rlim_cur = RLIM_INFINITY;
@@ -215,13 +225,40 @@ int main (const int argc, char* argv[]) {
     }
     int k = atol(argv [1]);
     boost::filesystem::path orig_file = boost::filesystem::path(argv [2]);
-    SR_index index(k, 100);
+    ifstream file_in(orig_file.string(), ifstream::in);
+    string seq;
+    file_in >> seq; file_in >> seq;
+    file_in.close();
+    
+    SR_index index(k, seq.size());
     index.construct(orig_file.string());
     string query;
-    while (cin >> query) {
-        for (auto x : index.find_reads(query)) {
+
+    file_in.open(orig_file.string(), ifstream::in);
+    int counter = 0;
+    while (file_in >> seq) {
+        file_in >> seq;
+        bool ok = false;
+        string q = seq.substr(rand()%(seq.size() - k + 1), k);
+        vector <int> results = index.find_reads(q, false);
+        for (auto x : results) {
+            if (x == counter) {
+                ok = true;
+                break;
+            }
+        }
+        if (!ok) {
+            cerr << "String not found where expected!\n";
+            cerr << q << ' ' << counter << endl;
+        }
+        counter++;
+    } 
+    cerr << "finish" << endl;
+/*    while (cin >> query) {
+        for (auto x : index.find_reads(query, true)) {
             cout << x << ' ';
         }
         cout << endl;
-    }
+    } */
+
 }
