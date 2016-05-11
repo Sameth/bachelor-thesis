@@ -15,6 +15,7 @@ class SR_index {
         long long k, max_read_length;
         sdsl::csa_wt<> fm_index;
         sdsl::vlc_vector<> counts;
+        sdsl::rrr_vector<> valid_end;
         sdsl::vlc_vector<> start_indices;
         sdsl::vlc_vector<> start_indices_permutation;
         sdsl::sd_vector<> new_read_start;

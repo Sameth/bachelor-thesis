@@ -62,6 +62,12 @@ void SR_index::construct_superstring(const string& fasta_file) {
     cerr << fm_index.size() << ' ' << counts.size() << endl;
     cerr << "FM index size in mb: " << size_in_mega_bytes(fm_index) << endl;
     cerr << "counts vector size in mb: " << size_in_mega_bytes(counts) << endl;
+    bit_vector valid_ends(string_counts.size());
+    for (auto i = 0; i < string_counts.size(); i++) {
+        valid_ends [i] = (string_counts [i] > 1);
+    }
+    valid_end = rrr_vector<>(valid_ends);
+    cerr << "Valid ends vector size in mb: " << size_in_mega_bytes(valid_end) << endl;
 //    cerr << "superstring: " << extract(fm_index, 0, fm_index.size() - 1) << endl;
 /*    for (int v : string_counts) {
         cerr << v << ' ';
