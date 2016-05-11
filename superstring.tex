@@ -5,7 +5,7 @@ ako veľmi berieme do úvahy požadovanú funkcionalitu a povahu reálnych dát.
     \item Indexovanie do $k$-nadslova
     \item Tolerancia chýb v dátach
 \end{enumerate}
-V tejto kapitole sa pozrieme na prvú z týchto úrovní, pozrieme sa na ťažkosť problému
+V tejto kapitole sa pozrieme na prvú z týchto úrovní, pozrieme sa na zložitosť problému
 a na spôsob, akým vieme $k$-nadslovo hľadať efektívne, pokiaľ sú splnené pre naše
 použitie rozumné predpoklady.
 
@@ -15,11 +15,11 @@ $k$-nadslovom tejto množiny reťazcov a ľahko vidno, že naopak to neplatí.
 
 Na druhú stranu, každé slovo dlhé $n > k$ vieme rozvinúť na $n - k + 1$ slov dlhých
 presne $k$ tak, že hľadané nadslovo ostane presne to isté. V ďalšej časti si zhrnieme
-a popíšeme zopár výsledkov o ťažkosti problému najkratšieho $k$-nadslova.
+a popíšeme zopár výsledkov o zložitosti problému najkratšieho $k$-nadslova.
 
 
 %##################################################################################
-\section{Ťažkosť problému}
+\section{Zložitosť problému}
 %##################################################################################
 
 \begin{defn}
@@ -29,10 +29,10 @@ a dané $l$ zistiť, či existuje $k$-nadslovo množiny $S$ dlhé nanajvýš $l$
 \end{defn}
 
 Najprv sa pozrieme na problém pre neobmedzenú abecedu. Keďže tento problém je
-vo svojej podstate rovnaký ako rozhodovací problém nadslova, môžeme využiť výsledky
+vo svojej podstate rovnaký ako rozhodovací problém nadslova s fixnou dĺžkou reťazcov, môžeme využiť mnohé výsledky
 pre obyčajný problém nadslova: pre $k \leq 2$ je problém polynomiálne riešiteľný,
 pre $k \ge 3$ je $\mathcal{NP}$-úplný pomocou redukcie z problému hamiltonovskej
-kružnice v orientovanom grafe \cite{superstring}.
+kružnice v orientovanom grafe \cite{superstring}. Konštrukciu pre $k = 3$ si popíšeme.
 
 Prvým krokom redukcie v článku Gallanta, Meiera a Storera je skonštruovať orientovaný
 graf $G'$ s vopred určeným počiatočným aj koncovým vrcholom, v ktorom každý vrchol $V$
@@ -63,9 +63,9 @@ vlastnosťou je, že konštrukcia používa $(2n + 10)$-znakovú abecedu.
 \subsection{Obmedzená veľkosť abecedy}
 %--------------------------------------------------------------------------------
 
-S obmedzenou veľkosťou abecedy $\Sigma$ je náročné hovoriť o ťažkosti problému, keďže
+S obmedzenou veľkosťou abecedy $\Sigma$ je náročné hovoriť o zložitosti problému, keďže
 slov dĺžky $k$ nad obmedzene veľkou abecedou je konečne veľa. Za dobrý odhad
-ťažkosti problému však považujeme také číslo $n$, že pomocou rozhodovacieho
+zložitosti problému však považujeme také číslo $n$, že pomocou rozhodovacieho
 problému $k$-nadslova vieme rozhodovať aj ľubovoľnú inštanciu problému
 hamiltonovskej kružnice s nanajvýš $n$ vrcholmi.
 
@@ -100,7 +100,7 @@ najkratšieho $k$-nadslova reťazcov nad $n$-znakovou abecedou.
 \section{Abstrakcia}
 %###############################################################################
 
-Po zdôvodnení a dokázaní ťažkosti riešeného problému sa pozrieme na spôsob, akým ho budeme
+Po zdôvodnení a dokázaní zložitosti riešeného problému sa pozrieme na spôsob, akým ho budeme
 riešiť. Ako prvé si objasníme abstrakciu problému, na ktorej postavíme celé riešenie.
 
 Sadu vstupných slov si budeme reprezentovať ako mierne upravený ohodnotený de Bruijnov graf stupňa $k - 1$ nad
