@@ -43,6 +43,10 @@ Na dotazovaný reťazec $r$ teda nájdeme všetky jeho začiatky v $k$-nadslove.
 v poli výskytov nájdeme aspoň pre jeden koniec výskytu hodnotu $Pravda$, odpovieme
 tiež $Pravda$, v opačnom prípade odpovieme $Nepravda$.
 
+Aby sme čo najviac zmenšili veľkosť poľa výskytov, uložíme si ho skomprimované
+podľa techniky z článku Ramana, Ramana a Raa \cite{rrr_vector}. Používame implementáciu
+z SDSL.
+
 \section{Počet výskytov podreťazca}
 
 Podobne, ako zisťovanie prítomnosti nejakého podreťazca, môžeme vyriešiť aj podporu
@@ -82,15 +86,116 @@ Keď si nejaké konkrétne čítanie priložíme na nejakú pozíciu v $k$-nadsl
 nie všetky jeho znaky sa budú zhodovať s nadslovom.
 
 Informáciu o tom, ktoré pozície čítania sa zhodujú s nadslovom, si budeme ukladať
-do jedného poľa pravdivostných hodnôt. Pre jednoduchosť budeme predpokladať, že
-každé čítanie má rovnakú dĺžku, $q$. Najprv si predstavme, že pre každý začiatok nejakého prekryvu si
-vyhradíme $q$ hodnôt, každá označujúc, či sa znak na zodpovedajúcom mieste zhoduje.
+do jedného poľa pravdivostných hodnôt, nazvime ho pole správnych pozícií. Pre jednoduchosť budeme predpokladať, že
+každé čítanie má rovnakú dĺžku, $q$. Pre každý začiatok nejakého prekryvu si
+vyhradíme $q$ hodnôt, každá označujúc, či sa znak na zodpovedajúcom mieste zhoduje.
 
-Keďže však existuje komprimované poľe pravdivostných hodnôt,
-ktorého veľkosť je úmerná počtu hodnôt $Pravda$, namiesto ukladania jednotiek
-si budeme na každý začiatok súvislého úseku hodnôt $Pravda$ ukladať iba jednu takúto
-hodnotu, za koniec si uložíme druhú. Na zistenie toho, či nejaká pozícía zodpovedá
-prekryvu nám potom stačí zistiť, aká je parita počtu hodnôt $Pravda$ od tohto miesta
-doľava, párny počet znamená nezhodu, nepárny zhodu.
+Zistiť začiatky a pole správnych pozícií je pomerne priamočiare. Znova prejdeme cez všetky čítania. 
+Pre každú $k$-ticu si zistíme, kde sa nachádza v $k$-nadslove pomocou FM-indexu.
+To nám povie, kde by sa muselo začínať čítanie tak, aby sa prekrývalo s $k$-nadslovom
+v tejto $k$-tici. Nakoniec zlúčime všetky rovnaké začiatky vrámci jedného čítania a
+doplníme ich na koniec poľa začiatkov.
 
+Keďže jedna $k$-tica sa môže v $k$-nadslove nachádzať viackrát, spomedzi všetkých
+jej výskytov vtberieme ten, ktorý má na konci v poli výskytov hodnotu $Pravda$.
 
+Každej $k$-tici z každého čítania teraz zodpovedá práve jeden začiatok v $k$-nadslove,
+viacerým $k$-ticiam môže zodpovedať ten istý. V poli správnych pozícií pre nejaký začiatok $z$
+teda označíme za správne pozície iba tie, ktoré zodpovedajú nejakej $k$-tici, pre ktorú sme
+začiatok $z$ vytvorili.
+
+Nakoniec, namiesto toho, aby sme si ukladali pre každú pozíciu z čítania samostatnú pravdivostnú
+hodnotu, využijeme vlastnosť, že pre každú začiatočnú pozíciu budú
+správne pozície v poli správnych pozícií s vysokou pravdepodobnosťou pri sebe a že každá správna pozícia je
+v súvislom bloku s aspoň $k-1$ ďalšími. Pre každý súvislý blok správnych hodnôt si
+na jeho začiatok a na políčko za jeho koncom uložíme jednu hodnotu $Pravda$.
+Pokiaľ máme obmedzenie, že každé čítanie má dĺžku najviac $q$, pre každý začiatok
+potrebujeme v poli správnych pozícií $q+1$ hodnôt.
+
+Ak chceme pre nejaký začiatok $z$, ktorý je $i$-ty spomedzi začiatkov, a pre nejaký
+úsek pozícii od $x$ po $x+c$ v tomto začiatku zistiť, či je tento úsek správny,
+stačí nám overiť si dve vlastnosti:
+\begin{enumerate}
+    \item $rank(i*(q+1) + x) \equiv 1 \pmod{2}$
+    \item $rank(i*(q+1) + x) = rank(i*(q+1) + x + c)$
+\end{enumerate}
+Prvou z týchto vlastností si zaručíme, že pozícia $x$ je naozaj správna, druhou si
+zaručíme, že medzi $x$ a $x + c$ sú tiež všetky pozície správne, keďže v nich
+nenastal žiaden koniec správneho úseku.
+
+Očakávame, že takáto reprezentácia poľa správnych pozícií bude obsahovať iba
+málo hodnôt $Pravda$, na jej uloženie teda môžeme využiť vhodnú štruktúru pre
+riedke polia, $sdarray$ \cite{sdarray}, opäť použijeme implementáciu z SDSL.
+
+Aby sme vedeli rýchlo vyhľadávať, zavedieme si ešte jedno pole, ktoré bude
+obsahovať smerníky na začiatky, usporiadané podľa pozície začiatku. Pomocou
+tohto poľa budeme vedieť rýchlo zistiť, ktoré začiatky za prekrývajú
+s nejakým úsekom pozícií v $k$-nadslove.
+
+Aby sme vedeli povedať, ktorému čítaniu zodpovedá nejaký začiatok, zavedieme
+si nové pole pravdivostných hodnôt. Toto pole bude rovnako dlhé ako pole začiatkov
+a hodnotu $Pravda$ bude mať pri prvom začiatku každého čítania. Dôležité je uvedomiť
+si, že začiatky vytvárame postupne pre prvé čítanie, potom pre druhé, atď.
+Pre $i$-ty začiatok zistíme, ktorému čítaniu zodpovedá, ako $rank(i)$ v tomto novom poli.
+
+\subsection{Riešenie dotazu}
+
+Pre hľadaný reťazec $r$ si najprv nájdeme, kde sú jeho výskyty v $k$-nadslove
+pomocou FM-indexu. Spomedzi všetkých týchto výskytov nás budú zaujímať iba tie,
+ktorých koniec má v poli výskytov hodnotu $Pravda$.
+
+Pre každý takýto výskyt binárne vyhľadáme najmenší začiatok, ktorý sa kryje s celým
+výskytom a overíme si v poli správnych pozícií, či nejde o falošný prekryv.
+Ak je prekryv naozaj pravý, pridáme čítanie, ktorému zodpovedal daný začiatok,
+do výsledku.
+
+\subsection{Redukcia počtu začiatkov}
+
+Veľkosť všetkých pomocných štruktúr, ktoré potrebujeme pre zistenie, ktoré
+čítania obsahovali daný podreťazec, spoločne s časom vykonávania tohto
+dotazu, je úzko späté s počtom začiatkov, ktoré si ukladáme. V tejto
+časti si popíšeme, ako budeme ešte počas vytvárania $k$-nadslova zmenšovať
+počet týchto začiatkov.
+
+Toto vieme docieliť tak, že vo výslednom korektnom slede v $k$-grafe vstupnej
+množiny slov budeme preferovať, aby niektoré hrany boli použité priamo po sebe.
+Pokiaľ máme napríklad pri $k = 3$ vstupné slovo \verb_AGGC_, budeme preferovať,
+aby po hrane z vrchola \verb_(AG)_ do \verb_(GG)_ nasledovala hrana z \verb_GG_
+do \verb_GC_. Tým dosiahneme, že vo výslednom $k$-nadslove sa bude nachádzať
+podreťazec \verb_AGGC_, čiže $k$-tice \verb_AGG_ a \verb_GGC_ budú mať ten istý
+začiatok.
+
+Keďže samotné rýchle hľadanie eulerovského ťahu v grafe sa ťažko prispôsobuje
+preferovaniu nejakej následnosti hrán, namiesto toho si zavedieme jednoduchú
+operáciu spájania hrán na grafe, ktorú budeme vykonávať ešte pred hľadaním ťahu. Pokiaľ
+máme hrany $e_1 = (V_1, V_2)$ a $e_2 = (V_2, V_3)$ a preferujeme, aby $e_2$
+nasledovala po $e_1$, môžeme obe hrany z grafu odstrániť a pridať namiesto nich \emph{spojenú}
+hranu $e_3 = (V_1, V_3)$. Spojiť môžeme samozrejme aj viacero hrán dohromady. Pre
+každú spojenú hranu si budeme pamätať, z postupnosti akých pôvodných hrán sa
+skladá.
+
+Jednou nevýhodou takejto operácie je, že môže zvýšiť počet komponentov v grafe,
+ako jednoduchý príklad môžu slúžiť graf pozostávajúci z dvoch cyklov, ktoré
+zdieľajú jeden vrchol $V$. Ak v jednom z týchto cyklov prepojíme hrany
+prechádzajúce cez $V$, v pôvodne súvislom grafe ostanú dva komponenty.
+
+Spájať hrany môžeme viacerými spôsobmi, niektoré z nich môžu zaručiť, že sa
+nezvýši počet komponentov, niektoré môžu aj napriek zvýšeniu počtu komponentov
+pospájať viacero hrán dohromady. V našej implementácii sme sa rozhodli pre druhú
+z týchto možností, keďže predpokladáme, že nám takto vznikne pomerne málo nových
+komponentov a za každý rozpad sa nám $k$-nadslovo predĺži najviac o $k-1$ znakov.
+
+Základný algoritmus nadpájania hrán, ktorý používame, bude nasledovný:
+\begin{enumerate}
+    \item Prejdi cez všetky vstupné slová, pre každú dvojicu hrán $e_1$ a $e_2$, ktoré
+          môžu ísť po sebe zisti, v koľkých vstupných slovách naozaj idú po sebe.\\
+          Túto hodnotu označíme ako skóre spojenia hrán $e_1$ a $e_2$.
+    \item V každom vrchole grafu nájdi párovanie hrán s najväčším súčtom skóre. Z
+          párenia odstráň spojenia hrán s nulovým skóre.
+    \item Spoj všetky postupnosti hrán, ktoré vznikli v predošlom kroku.
+\end{enumerate}
+
+Pri predbežných testoch tento postup naozaj počet
+komponentov grafu $k$-grafu vstupných slov zvýšil iba minimálne. Tým pádom
+sa nijako výrazne nezmenila dĺžka $k$-nadslova.
+Počet začiatkov však klesol zhruba na polovicu.
