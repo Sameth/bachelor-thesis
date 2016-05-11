@@ -12,7 +12,7 @@
 
 class SR_index {
     private:
-        int k, max_read_length;
+        long long k, max_read_length;
         sdsl::csa_wt<> fm_index;
         sdsl::vlc_vector<> counts;
         sdsl::vlc_vector<> start_indices;
@@ -25,7 +25,7 @@ class SR_index {
     public:
         void construct(const string&);
         void construct_superstring(const string&);
-        SR_index(int kk, int max_read): k(kk), max_read_length(max_read){}
+        SR_index(long long kk, long long max_read): k(kk), max_read_length(max_read){}
         vector <int> find_reads(const string&, bool);
 };
 

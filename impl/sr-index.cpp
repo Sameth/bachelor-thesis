@@ -75,7 +75,7 @@ void SR_index::construct(const string& fasta_file) {
     
     ifstream file_in(fasta_file, ifstream::in);
     string seq;
-    vector <int> start_indices;
+    vector <long long> start_indices;
     vector <bool> starts, valid_positions;
     int k = this -> k;
     while (file_in >> seq) {
@@ -127,7 +127,7 @@ void SR_index::construct(const string& fasta_file) {
         }
     }
 
-    vector <int> start_indices_permutation(start_indices.size());
+    vector <long long> start_indices_permutation(start_indices.size());
     for (int i = 0; i < start_indices.size(); i++) {
         start_indices [i] += max_read_length;
         start_indices_permutation [i] = i;
@@ -167,7 +167,7 @@ vector<int> SR_index::find_reads(const string& query, bool debug) {
         cerr << "Query longer than k\n";
         exit(1);
     }
-    int the_position = -1;
+    long long the_position = -1;
     vector <int> result;
     for (auto pos : locate(fm_index, query)) {
         if (counts [pos + query.size() - 1] > 1) {
@@ -182,18 +182,18 @@ vector<int> SR_index::find_reads(const string& query, bool debug) {
 
     if (debug) cerr << "THE position : " << the_position << endl;
 
-    int lower = -1, upper = start_indices_permutation.size();
+    long long lower = -1, upper = start_indices_permutation.size();
     while (upper - lower > 1) {
         int middle = (upper + lower) / 2;
         if (start_indices[start_indices_permutation[middle]]  < the_position + query.size() - 1) lower = middle;
         else upper = middle;
     }
-    int current = upper;
-    if (debug) cerr << "First possible index: " << current << ' ' << start_indices [start_indices_permutation [current]] << ' ' << (int) start_indices [start_indices_permutation [current] ] - max_read_length << endl << "Zaciatok ";
+    long long current = upper;
+    if (debug) cerr << "First possible index: " << current << ' ' << start_indices [start_indices_permutation [current]] << ' ' << (long long) start_indices [start_indices_permutation [current] ] - max_read_length << endl << "Zaciatok ";
     set <int> results;
-    while (current < start_indices_permutation.size() && (int) start_indices[start_indices_permutation[current]] - max_read_length <= the_position) {
-        int curstart = start_indices [start_indices_permutation[current]] - max_read_length;
-        int valid_in_read_offset = (max_read_length + 1) * start_indices_permutation [current];
+    while (current < start_indices_permutation.size() && (long long) start_indices[start_indices_permutation[current]] - max_read_length <= the_position) {
+        long long curstart = start_indices [start_indices_permutation[current]] - max_read_length;
+        long long valid_in_read_offset = (max_read_length + 1) * start_indices_permutation [current];
         if (debug) cerr << start_indices_permutation[current];
         if ((valid_in_read_rank(valid_in_read_offset + the_position - curstart + 1) % 2) == 1 && (valid_in_read_rank(valid_in_read_offset + the_position - curstart + query.size()) == valid_in_read_rank(valid_in_read_offset + the_position - curstart + 1))) {
             results.insert(read_start_rank(start_indices_permutation [current] + 1));
@@ -210,7 +210,7 @@ vector<int> SR_index::find_reads(const string& query, bool debug) {
 
 }
 
-int main (const int argc, char* argv[]) {
+/*int main (const int argc, char* argv[]) {
     string usage = string(argv [0]) + " <k> <fasta_file>";
     if (argc < 3) {
         cout << usage << endl;
@@ -254,11 +254,11 @@ int main (const int argc, char* argv[]) {
         counter++;
     } 
     cerr << "finish" << endl;
-/*    while (cin >> query) {
+    while (cin >> query) {
         for (auto x : index.find_reads(query, true)) {
             cout << x << ' ';
         }
         cout << endl;
-    } */
+    } 
 
-}
+} */
