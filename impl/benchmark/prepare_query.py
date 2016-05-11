@@ -12,7 +12,7 @@ try:
         randomseq = ""
         for i in range(qlen):
             randomseq += random.choice(chars)
-        print(randomseq)
+#        print(randomseq)
 
 
 except EOFError:
