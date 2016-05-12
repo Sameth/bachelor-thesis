@@ -69,8 +69,9 @@ je nenulový, ostatné musia byť nulové. Dôležité je však poznamenať, že
 riešenie dotazu nemusí dávať správnu odpoveď pre dotazované reťazce kratšie ako $k$.
 
 Aby toto pole čísel nezaberalo oveľa viac pamäte, než samotný FM-index, uložíme
-si ho skomprimované v štruktúre, ktorá je implementovaná v SDSL \cite{sdsl}.
-Experimenty ukázali, že vhodne skomprimované pole zaberá zhruba toľko miesta,
+si ho skomprimované pomocou prefixového kódovania \cite{integer_coding}, implementovaného
+s rýchlym náhodným prístupom v knižnici v SDSL \cite{sdsl}.
+Experimenty ukázali, že skomprimované pole zaberá zhruba toľko miesta,
 čo FM-index.
 
 \section{Čítania s podreťazcom}
@@ -110,7 +111,20 @@ správne pozície v poli správnych pozícií s vysokou pravdepodobnosťou pri s
 v súvislom bloku s aspoň $k-1$ ďalšími. Pre každý súvislý blok správnych hodnôt si
 na jeho začiatok a na políčko za jeho koncom uložíme jednu hodnotu $Pravda$.
 Pokiaľ máme obmedzenie, že každé čítanie má dĺžku najviac $q$, pre každý začiatok
-potrebujeme v poli správnych pozícií $q+1$ hodnôt.
+potrebujeme v poli správnych pozícií $q+1$ hodnôt. Konkrétny príklad je uvedený v obrázku \ref{obr:zar-struct}.
+
+\begin{figure}
+
+\centerline{\includegraphics[width=1\textwidth]{images/zarovnanie-3-3.pdf}}
+
+\caption[Zarovnanie a štruktúry]{Ukážkový príklad začiatkov a zodpovedajúcich úsekov v poli správnych pozícií
+pre vstupné slová $\texttt{ACCGC}$ a $\texttt{GGAAT}$ s $k$-nadslovom $\texttt{AGGAAGGCGAAT}$ a poľom výskytov
+$\texttt{110110111001}$, kde $\texttt{1}$ reprezentuje hodnotu $Pravda$.}
+
+\label{obr:zar-struct}
+
+\end{figure}
+
 
 Ak chceme pre nejaký začiatok $z$, ktorý je $i$-ty spomedzi začiatkov, a pre nejaký
 úsek pozícii od $x$ po $x+c$ v tomto začiatku zistiť, či je tento úsek správny,
