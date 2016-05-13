@@ -4,7 +4,114 @@ V tejto kapitole čiatateľa oboznámime so základnými biologickými
 a informatickými pojmami, s ktorými sa môže stretnúť v tejto práci, s motiváciou
 pre riešenie tohto problému a s inými, súvisiacimi prácami v tejto oblasti.
 
+\section{Biologická motivácia}
+
+Genetická informácia všetkých známych bunkových organizmov je uložená v
+deoxyribonukleovej kyseline, skrátene DNA. Ide o zložitú molekulu, pozostávajúcu
+z mnohých menších častí, ktoré sa nazývajú nukleotidy. Každý nukleotid pozostáva
+z fosfátového zvyšku, deoxyribózy a dusíkatej bázy. Nukleotidy sa od seba líšia
+v dusíkatej báze, ktorá môže byť štyroch typov: adenín, guanín, tymín, cytozín.
+
+Celá genetická informácia je kódovaná v podstate iba usporiadaním nukleotidov,
+pre krátkosť sa toto usporiadanie zapisuje reťazcom pozostávajúcim
+zo znakov \verb_A_, \verb_G_, \verb_T_ a \verb_C_, každý znak zodpovedajúci
+príslušnej dusíkatej báze. Celá genetická informácia jedného organizmu sa nazýva
+genóm. Proces zisťovania genómu, čiže postupnosti dusíkatých báz, resp.
+znakov, sa nazýva sekvenovanie.
+
+\subsection{Sekvenovanie}
+
+Väčšina sekvenovacích postupov má spoločné črty. Pomocou zložitých chemických
+a fyzikálnych procesov sa najprv zistí mnoho krátkych reťazcov, ktoré sa
+v reťazci DNA nachádzajú na vopred neznámych miestach. Tieto krátke reťazce
+sa nazývajú \emph{čítania}, z anglického \emph{read}.
+
+Z týchto čítaní sa potom pomocou rôznych algoritmov zisťuje, aký bol celý reťazec DNA.
+Tento proces, nazývaný skladanie sekvencií, je pomerne náročný, keďže čítania sa nachádzajú na neznámych miestach
+v DNA a navyše, väčšina metód na ich zistenie má malú šancu pomýliť sa pri určovaní
+jedného nukleotidu. Preto sa pri každej metóde sekvenovania zisťuje toľko čítaní, aby
+v priaznivom prípade mnohonásobne pokryli celý reťazec DNA. Očakávaný počet, koľkokrát
+sme pokryli jeden konkrétny nukleotid týmito čítaniami, sa nazýva \emph{pokrytie},
+z anglického \emph{coverage}.
+
+\subsection{Indexácia čítaní}
+
+Pokiaľ máme k dispozícii genóm nejakého jedinca, môže nás zaujímať, koľko, prípadne
+ktoré čítania sa prekrývajú s nejakou časťou. Pomocou takýchto dotazov vieme zisťovať
+mnohé zaujímavé informácie. Jednou možnosťou je napríklad hľadať rozdiely medzi
+jedincami jedného druhu, inou je zisťovať, ktoré časti DNA majú akú funkciu, prípadne
+ktoré majú vôbec nejakú. Pre prípady, kedy máme k dispozícii referenčný genóm živočíšneho
+druhu, existujú efektívne štruktúry, ktoré vedia na dané dotazy odpovedať.
+
+V mnohých prípadoch však referenčný genóm k dispozícii nemáme, napriek tomu by sme
+radi vedeli odpovedať na podobné otázky. Jedno konkrétne uplatnenie leží napríklad
+v metóde skladaní sekvencíí GAML \cite{gaml}.
+
+V práci Philippe, Salsona a kol. \cite{gk_arrays} sa spomína sedem typov otázok,
+ktoré môžeme mať na nejakú sadu čítaní:
+
+\begin{enumerate}
+    \item Ktoré čítania obsahujú daný podreťazec $f$?
+    \item Koľko čítaní obsahuje daný podreťazec $f$?
+    \item Na ktorých pozíciach v čítaniach sa nachádza daný podreťazec $f$?
+    \item Koľkokrát sa dohromady vyskytuje daný podreťazec $f$ v čítaniach?
+    \item V ktorých čítaniach sa vyskytuje podreťazec $f$ iba raz?
+    \item V koľkých čítaniach sa vyskytuje podreťazec $f$ iba raz?
+    \item Na ktorých pozíciach v čítaniach sa nachádza podreťazec $f$, pričom nás
+    zaujímajú iba tie čítania, ktoré ho obsahujú raz?
+\end{enumerate}
+
+Cieľom tejto práce bude navrhnúť
+štruktúru, ktorá bude schopná efektívne odpovedať na niektoré z týchto otázok
+a ktorá bude zároveň zaberať čo najmenej miesta v pamäti.
+
+\section{Súvisiaca práca}
+
+Prvou význačnou prácou pri indexácii čítaní sú tzv. Gk-Arrays \cite{gk_arrays}, ktoré
+vyhľadávajú podreťazce s pomocou upravených sufixových polí nad zreťazením všetkých
+čítaní.
+
+Myšlienku Gk-arrays posunuli ďalej Välimäki a Rivals, keď prišli s komprimovanou
+verziou \cite{comp_gk_arrays}.
+
+S myšlienkovo odlišným riešením prišli Boža a Jursa. Namiesto zreťazenia čítaní v
+ich CR-indexe \cite{cr_index} nájdu nadslovo všetkých čítaní a pomocou neho
+odpovedajú na dotazy. V tejto práci rozvinieme podobnú myšlienku s tým, že budeme
+hľadať mierne odlišné nadslovo.
+
+\section{Definície}
+
+Vrámci celej práce budeme považovať nulu za prirodzené číslo. Pod podslovom slova $s$
+budeme rozumieť súvislú podpostupnosť jeho písmen. Jednou z centrálnych definícií bude
+pojem $k$-nadslova.
+
+\begin{defn}
+    Nech $k > 1$ je celé číslo. Nech $\Sigma$ je nejaká abeceda a nech $S$ je množina
+    slov dlhých aspoň $k$ nad abecedou $\Sigma$. Potom $k$-nadslovom množiny $S$ nazveme také slovo
+    nad abecedou $\Sigma$, pre ktoré platí, že každé podslovo nejakého slova z $S$ je
+    zároveň podslovom $k$-nadslova.
+\end{defn}
+
+V tejto práci budeme taktiež používať orientované grafy. Pod pojmom orientovaný graf $G$ budeme
+rozumieť dvojicu $(V, E)$, kde $V$ je množina vrcholov a $E$ je množina usporiadaných
+dvojíc $(v_1, v_2)$, kde $v_1$ aj $v_2$ sú vrcholmi grafu. Budeme hovoriť, že hrana $e$ vedie
+z vrchola $v_1$ do vrchola $v_2$, pokiaľ $e = (v_1, v_2)$.
+
+Pre graf $G$ budeme používať $V(G)$ na označenie jeho množiny vrcholov a $E(G)$ na označenie jeho
+množiny hrán. Pod množinou výstupných hrán
+vrchola $v$ budeme rozumieť množinu $out(v) = \{ (v, v_2) | v_2 \in V(G) \}$ a podobne,
+pod množinou vstupných hrán budeme rozumieť množinu $in(v) = \{ (v_1, v) | v_1 \in V(G) \}$.
+Pre vrchol $v$ určíme jeho výstupný stupeň ako $d_O(v) = |out(v)|$ a jeho vstupný stupeň ako $d_I(v) = |in(v)|$.
+
+V prípade, že budeme hovoriť o viacerých grafoch a z kontextu nie je jasné, na ktorý z nich
+sa niektorý z pojmov vzťahuje, tento graf zadefinujeme v hornom indexe, napríklad
+$d_O^{G_2}(v)$ bude označovať výstupný stupeň vrchola $v$ v grafe $G_2$.
+
+Pod pojmom \emph{sled grafu $G$} budeme rozumieť ľubovoľnú striedavú postupnosť vrcholov
+a hrán $v_1 e_1 v_2 e_2 \ldots v_{n-1} e_{n-1} v_n$, ktorá začína aj končí nejakým vrcholom
+grafu $G$ a v ktorej každá hrana $e_i$ vedie z vrchola $v_i$ do vrchola $v_{i+1}$.
+
 %TODO: Definicia k-nadslova sa musi vysporiadat so slovami kratsimi ako k.
-%TODO: Definicia prekrytia
 %TODO: Definicia k-nadslova musi zarucit, ze S obsahuje aspon jedno slovo dlzky k.
 %TODO: Definicia stupnov (delt) musi zadefinovat aj, v ktorom grafe.
+%TODO: rank, (select?)
