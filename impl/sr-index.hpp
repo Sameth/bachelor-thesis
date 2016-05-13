@@ -28,6 +28,7 @@ class SR_index {
         void construct_superstring(const string&);
         SR_index(long long kk, long long max_read): k(kk), max_read_length(max_read){}
         vector <int> find_reads(const string&, bool);
+        void print_superstring();
 };
 
 #endif //SR_INDEX__

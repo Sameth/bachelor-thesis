@@ -83,6 +83,8 @@ void SR_index::construct(const string& fasta_file) {
     string seq;
     vector <long long> start_indices;
     vector <bool> starts, valid_positions;
+    vector <long long> set_bits;
+    long long current_offset = 0;
     int k = this -> k;
     while (file_in >> seq) {
         file_in >> seq;
@@ -116,17 +118,17 @@ void SR_index::construct(const string& fasta_file) {
                 starts.push_back(false);
                 bool last = false;
                 for (int j = 0; j <= max_read_length; j++) {
-                    if (validinread [j] != last) valid_positions.push_back(true);
-                    else valid_positions.push_back(false);
+                    if (validinread [j] != last) set_bits.push_back(current_offset + j);
                     last = validinread [j];
                     validinread [j] = false;
                 }
+                current_offset += max_read_length + 1;
             }
             for (int j = positions [i].second; j < positions [i].second + k; j++) validinread [j] = true;
         }
         bool last = false;
         for (int j = 0; j <= max_read_length; j++) {
-            if (validinread [j] != last) valid_positions.push_back(true);
+            if (validinread [j] != last) set_bits.push_back(current_offset + j);
             else valid_positions.push_back(false);
             last = validinread [j];
             validinread [j] = false;
@@ -158,11 +160,11 @@ void SR_index::construct(const string& fasta_file) {
     cerr << "start_indices_permutation vlc " << size_in_mega_bytes(this->start_indices_permutation) << endl;
     bit_vector starts_b(starts.size()), valid_positions_b(valid_positions.size());
     for (unsigned int i = 0; i < starts.size(); i++) starts_b [i] = starts [i];
-    for (unsigned int i = 0; i < valid_positions.size(); i++) valid_positions_b [i] = valid_positions [i];
+//    for (unsigned int i = 0; i < valid_positions.size(); i++) valid_positions_b [i] = valid_positions [i];
     this -> new_read_start = sd_vector<>(starts_b);
     this -> read_start_rank = sd_vector<>::rank_1_type(&(this -> new_read_start));
     cerr << "starts sd_vector: " << size_in_mega_bytes(this -> new_read_start) << endl;
-    this -> valid_in_read = sd_vector<>(valid_positions_b);
+    this -> valid_in_read = sd_vector<>(set_bits.begin(), set_bits.end());
     this -> valid_in_read_rank = sd_vector<>::rank_1_type(&(this -> valid_in_read));
     cerr << "valid in read sd_vector: " << size_in_mega_bytes(this -> valid_in_read) << endl;
     file_in.close();
@@ -216,55 +218,6 @@ vector<int> SR_index::find_reads(const string& query, bool debug) {
 
 }
 
-/*int main (const int argc, char* argv[]) {
-    string usage = string(argv [0]) + " <k> <fasta_file>";
-    if (argc < 3) {
-        cout << usage << endl;
-        return 1;
-    }
-    cerr << vector <int>().max_size() << endl;
-    struct rlimit stack_limit;
-    getrlimit(RLIMIT_STACK, &stack_limit);
-    stack_limit.rlim_cur = RLIM_INFINITY;
-    if (setrlimit(RLIMIT_STACK, &stack_limit) != 0) {
-        cerr << "Unlimiting stack size failed, might crash.\n";
-    }
-    int k = atol(argv [1]);
-    boost::filesystem::path orig_file = boost::filesystem::path(argv [2]);
-    ifstream file_in(orig_file.string(), ifstream::in);
-    string seq;
-    file_in >> seq; file_in >> seq;
-    file_in.close();
-    
-    SR_index index(k, seq.size());
-    index.construct(orig_file.string());
-    string query;
-
-    file_in.open(orig_file.string(), ifstream::in);
-    int counter = 0;
-    while (file_in >> seq) {
-        file_in >> seq;
-        bool ok = false;
-        string q = seq.substr(rand()%(seq.size() - k + 1), k);
-        vector <int> results = index.find_reads(q, false);
-        for (auto x : results) {
-            if (x == counter) {
-                ok = true;
-                break;
-            }
-        }
-        if (!ok) {
-            cerr << "String not found where expected!\n";
-            cerr << q << ' ' << counter << endl;
-        }
-        counter++;
-    } 
-    cerr << "finish" << endl;
-    while (cin >> query) {
-        for (auto x : index.find_reads(query, true)) {
-            cout << x << ' ';
-        }
-        cout << endl;
-    } 
-
-} */
+void SR_index::print_superstring() {
+    cout << "superstring: " << extract(fm_index, 0, fm_index.size() - 1) << endl;
+}
