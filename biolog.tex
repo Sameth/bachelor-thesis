@@ -1,8 +1,9 @@
 \chapter{Základné pojmy, motivácia a súvisiace práce}
 
 V tejto kapitole čiatateľa oboznámime so základnými biologickými
-a informatickými pojmami, s ktorými sa môže stretnúť v tejto práci, s motiváciou
-pre riešenie tohto problému a s inými, súvisiacimi prácami v tejto oblasti.
+a informatickými pojmami, s ktorými sa môže stretnúť v tejto práci, s cieľom práce
+a s motiváciou pre riešenie tohto problému. Taktiež si spomenieme niekoľko
+prác súvisiacich s problematikou.
 
 \section{Biologická motivácia}
 
@@ -61,23 +62,45 @@ ktoré môžeme mať na nejakú sadu čítaní:
     zaujímajú iba tie čítania, ktoré ho obsahujú raz?
 \end{enumerate}
 
-Cieľom tejto práce bude navrhnúť
-štruktúru, ktorá bude schopná efektívne odpovedať na niektoré z týchto otázok
-a ktorá bude zároveň zaberať čo najmenej miesta v pamäti.
-
 \section{Súvisiaca práca}
 
 Prvou význačnou prácou pri indexácii čítaní sú tzv. Gk-Arrays \cite{gk_arrays}, ktoré
 vyhľadávajú podreťazce s pomocou upravených sufixových polí nad zreťazením všetkých
 čítaní.
-
 Myšlienku Gk-arrays posunuli ďalej Välimäki a Rivals, keď prišli s komprimovanou
 verziou \cite{comp_gk_arrays}.
 
 S myšlienkovo odlišným riešením prišli Boža a Jursa. Namiesto zreťazenia čítaní v
-ich CR-indexe \cite{cr_index} nájdu nadslovo všetkých čítaní a pomocou neho
-odpovedajú na dotazy. V tejto práci rozvinieme podobnú myšlienku s tým, že budeme
-hľadať mierne odlišné nadslovo.
+ich CR-indexe \cite{cr_index} nájdu nadslovo všetkých čítaní, nájdu pozícíe všetkých
+čítaní v tomto nadslove a pomocou toho odpovedajú na rôzne dotazy. Keďže čítania sú v zamýšľanom použití podreťazcami celého
+genómu s malou šancou chýb, očakávaná dĺžka ich nadslova je zhruba veľkosť genómu.
+
+\section{Ciele práce}
+
+Jedným z problémov CR-indexu boli chyby v čítaniach. Aj s pomerne malou chybovosťou
+v dátach sa pri veľkom pokrytí objaví veľa čítaní s aspoň jednou chybou, ktoré s vysokou
+pravdepodobnosťou nezapadnú do nadslova a budú napísané na konci nadslova s malými
+prekryvmi s inými čítaniami.
+
+Na druhú stranu, existujú nástroje, ktorými sa dá väčšina chýb v čítaniach zdetekovať
+a odstrániť. V CR-indexe pomocou takýchto nástrojov väčšinu chýb opravia a nadslovo
+hľadajú k opraveným čítaniam. Keďže si chcú zachovať korektnosť, chyby ukladajú tak
+že pre každú pozíciu každého čítania vedia povedať, či sa oproti časti nadslova,
+ku ktorej je čítanie zarovnané, líši.
+
+Všetky čítania a pozície, ktoré nájdu, musia skontrolovať, či obsahujú chyby na správnych miestach.
+Takéto riešenie je dobré, pokiaľ chceme odpovedať na otázky prvého, tretieho, piateho a
+siedmeho typu, keďže pri nich musíme aj tak nejakým spôsobom prejsť cez všetky výsledky.
+Pokiaľ nás však zaujímajú počty, prípadne iná agregovaná informácia, v takomto riešení
+musíme aj tak overiť všetky potenciálne čítania, ktoré získame.
+
+V tejto práci sa pozrieme na to, aké otázky sa dajú efektívne zodpovedať, pokiaľ
+oslabíme požiadavky na nadslovo, ktoré budeme pre čítania hľadať. Po tomto nadslove
+budeme požadovať iba to, aby obsahovalo každú $k$-ticu znakov, ktorá sa vyskytovala
+v niektorom čítaní, pre nejaké vopred zadané $k$. Aj keď zamýšľané použitie takéhoto
+prístupu sa orientuje na efektívne uchovávanie čítaní, problémy a algoritmy budeme
+formulovať všeobecnejšie, aby boli použiteľné aj v prípade, že nás zaujímajú podobné
+informácie o iných dátach s podobnými vlastnosťami, aké majú čítania.
 
 \section{Definície}
 
