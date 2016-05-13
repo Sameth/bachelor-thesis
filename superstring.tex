@@ -38,7 +38,7 @@ kružnice v orientovanom grafe \cite{superstring}. Konštrukciu pre $k = 3$ si p
 
 Prvým krokom redukcie v článku Gallanta, Meiera a Storera je skonštruovať orientovaný
 graf $G'$ s vopred určeným počiatočným aj koncovým vrcholom, v ktorom každý vrchol $V$
-okrem koncového spĺňa $\delta_O(V) > 1$. Pre daný orientovaný graf $G$
+okrem koncového spĺňa $d_O(V) > 1$. Pre daný orientovaný graf $G$
 skonštruujú nový graf rozdelením niektorého vrchola na počiatočný vrchol $s$ a
 koncový vrchol $t$ tak, že počiatočný si zachová všetky vychádzajúce a koncový
 všetky vchádzajúce hrany. Pre dodržanie veľkosti stupňa pridajú ešte tri vrcholy
@@ -53,7 +53,7 @@ je množina označených vrcholov a $S = \{\#, \$, \% \}$.
 
 Ďalej skonštruujú množinu slov prislúchajúcich hranám vrchola $v$ ako
 $A_v = \{ \bar{v}w_i\bar{v} | w_i \in R_v\} \cup \{ w_i \bar{v} w_{i \oplus 1} | w_i \in R_v\}$,
-kde $R_v$ je postupnosť hrán vychádzajúcich z $v$ a $\oplus$ je sčítanie modulo $\delta_O(v)$.
+kde $R_v$ je postupnosť hrán vychádzajúcich z $v$ a $\oplus$ je sčítanie modulo $d_O(v)$.
 Nakoniec skonštruujú množiny $C = \{ \bar{v} \# v | v \in V\}$ a $T = \{ \% \# \bar{1}, \bar{n} \# \$\}$.
 Nakoniec v článku dokážu, že graf $G'$ obsahuje hamiltonovskú cestu práve vtedy, keď
 existuje nadslovo množiny slov $C \cup T \cup (\bigcup\limits_{v \in V} A_v)$.
@@ -166,7 +166,7 @@ $k$-nadslovom množiny $S$. K tomu budeme potrebovať ešte jednu pomocnú lemu.
 
 \begin{lema}
 \label{vertex_end_lemma}
-    Nech $V_1 e_1 V_2 e_2 \ldots e_{n-1} V_n$ je sled v $k$-grafe nejakej množiny $S$.
+    Nech $V_1 e_1 V_2 e_2 \ldots e_{n-1} V_n$ je neprázdny sled v $k$-grafe nejakej množiny $S$.
     Potom sa reťazec $r$ prislúchajúci tomuto sledu končí $(k-1)$-ticou znakov zhodnou
     s označením vrchola $V_n$.
 \end{lema}
@@ -377,26 +377,26 @@ Základnou myšlienkou riešenia problému čínskeho poštára je pridať hrany
 tak, aby obsahoval eulerovský ťah \cite{chinesepostman}. Tento prístup funguje preto, že každý sled priamo
 zodpovedá eulerovskému ťahu pre nejaké doplnenie hrán do grafu.
 
-Súvislý orientovaný graf obsahuje eulerovskú kružnicu práve vtedy, keď vstupný stupeň $\delta_I$ je rovný
-výstupnému stupňu $\delta_O$ v každom vrchole, eulerovský ťah existuje aj v prípade, keď sa v najviac
+Súvislý orientovaný graf obsahuje eulerovskú kružnicu práve vtedy, keď vstupný stupeň $d_I$ je rovný
+výstupnému stupňu $d_O$ v každom vrchole, eulerovský ťah existuje aj v prípade, keď sa v najviac
 dvoch vrcholoch vstupný a výstupný stupeň líšia o $1$. Ak teda $k$-graf množiny $S$ má túto
 vlastnosť, nájdenie korektného sled je už len záležitosťou nájdenia eulerovského ťahu.
 
 Pokiaľ nutný podgraf $k$-graf množiny $S$ túto vlastnosť nemá, potrebujeme čo najlacnejšie pridať hrany z vrcholov s 
-$\delta_O < \delta_I$ do vrcholov s $\delta_I < \delta_O$, pričom využívať môžeme aj nepovinné hrany.
+$d_O < d_I$ do vrcholov s $d_I < d_O$, pričom využívať môžeme aj nepovinné hrany.
 Z lemy \ref{shortest_edge_lemma} vyplýva, že najlacnejšia cesta medzi dvomi vrcholmi je hrana medzi
 nimi, čiže zaujímať nás budú iba hrany medzi vrcholmi. Z toho vyplýva aj konštrukcia nasledovného grafu.
 
 \begin{defn}
     Nech $G$ je $k$-graf množiny $S$ a $G'$ je jeho nutný podgraf. Tokovým grafom grafu $G$
     označíme graf $H$, ktorého množinu vrcholov skonštruujeme nasledovne:
-    $V(G') = \{s, t\} \cup V_h \cup V_p$, kde $V_h$ (hladné) je množina $\{ v \in V(G) | \delta_O^{G'}(v) > delta_I^{G'}(v) \}$
-    a $V_p$ (presýtené) je množina $\{ v \in V(G) | \delta_I^{G'}(v) > delta_O^{G'}(v)\}$.
+    $V(G') = \{s, t\} \cup V_h \cup V_p$, kde $V_h$ (hladné) je množina $\{ v \in V(G) | d_O^{G'}(v) > delta_I^{G'}(v) \}$
+    a $V_p$ (presýtené) je množina $\{ v \in V(G) | d_I^{G'}(v) > delta_O^{G'}(v)\}$.
     Hrany grafu $H$ budú troch typov:
     \begin{enumerate}
         \item Tie hrany z grafu $G$, ktoré idú z presýteného vrchola do hladného s cenou rovnakou ako v $G$ a kapacitou $\infty$,
-        \item Hrany od $s$ do každého vrchola vo $V_p$ s cenou $0$. Kapacitu takéhoto typu hrany do vrchola $U$ určíme ako $\delta_I^{G'}(U) - \delta_O^{G'}(U)$,
-        \item Hrany od každého vrchola z $V_h$ do $t$ s cenou $0$. Kapacitu takéhoto typu hrany z vrchola $U$ určíme ako $\delta_O^{G'}(U) - \delta_I^{G'}(U)$.
+        \item Hrany od $s$ do každého vrchola vo $V_p$ s cenou $0$. Kapacitu takéhoto typu hrany do vrchola $U$ určíme ako $d_I^{G'}(U) - d_O^{G'}(U)$,
+        \item Hrany od každého vrchola z $V_h$ do $t$ s cenou $0$. Kapacitu takéhoto typu hrany z vrchola $U$ určíme ako $d_O^{G'}(U) - d_I^{G'}(U)$.
     \end{enumerate}
     Žiadne iné hrany v grafe $H$ nebudú.
 \end{defn}
@@ -438,7 +438,7 @@ vety.
 Poslednou vecou, ktorou sa budeme zaoberať v súvislom prípade, je časová zložitosť. Všetky časti
 algoritmu sa vykonávaju v čase lineárne závislom od veľkosti vstupu, okrem druhého a tretieho bodu.
 V týchto bodoch je pomerne nepravdepodobné, že existuje riešenie rýchlejšie, než kvadratické. To je
-spôsobené tým, že v najhoršom prípade môžu takmer všetky vrcholy grafu mať $\delta_I$ rôzne od $\delta_O$
+spôsobené tým, že v najhoršom prípade môžu takmer všetky vrcholy grafu mať $d_I$ rôzne od $d_O$
 a algoritmus, ktorý nájde najlepšie priradenie, sa potrebuje pozrieť na každú hranu.
 
 Keďže hľadanie
@@ -466,7 +466,7 @@ Ako sme spomínali vyššie, z povahy dát, pre ktoré hľadáme $k$-nadslovo,
 je celkom pravdepodobné, že náš nutný podgraf bude súvislý, prípadne že bude mať iba málo
 komponentov. Zároveň, v našom riešení pridáme nanajvýš $c - 1$ hrán navyše oproti
 optimálnemu riešeniu. Ďalej vieme, že sme do grafu pridávali hrany najlacnejším spôsobom
-tak, aby v každom vrchole platilo $\delta_I = \delta_I$. Keďže najväčšia možná hodnota
+tak, aby v každom vrchole platilo $d_I = d_I$. Keďže najväčšia možná hodnota
 hrany je $k-1$, znamená to, že riešenie, ktoré takto nájdeme, bude najviac o $(k - 1)(c - 1)$ drahšie
 ako optimálne, čiže takto nájdené $k$-nadslovo bude nanajvýš o toľko dlhšie od najkratšieho možného.
 
