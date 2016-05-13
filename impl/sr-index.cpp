@@ -118,7 +118,7 @@ void SR_index::construct(const string& fasta_file) {
                 starts.push_back(false);
                 bool last = false;
                 for (int j = 0; j <= max_read_length; j++) {
-                    if (validinread [j] != last) set_bits.push_back(current_offset + j);
+                    if (validinread [j] != last) set_bits.push_back(current_offset + j); 
                     last = validinread [j];
                     validinread [j] = false;
                 }
@@ -133,6 +133,7 @@ void SR_index::construct(const string& fasta_file) {
             last = validinread [j];
             validinread [j] = false;
         }
+        current_offset += max_read_length + 1;
     }
 
     vector <long long> start_indices_permutation(start_indices.size());
@@ -151,6 +152,12 @@ void SR_index::construct(const string& fasta_file) {
         cerr << e << ' ';
     }
     cerr << endl;  */
+
+/*    for (auto e : set_bits) {
+        cerr << e << ' ';
+    }
+    cerr << endl;
+*/
 
     file_in.close();
     cerr << "start_indices number of elements: " << start_indices.size() << endl;
