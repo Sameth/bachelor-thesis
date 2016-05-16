@@ -3,28 +3,32 @@
 V predošlej kapitole sme si popísali, ako vieme nájsť $k$-nadslovo k nejakej
 množine reťazcov. V tejto kapitole si popíšeme rôzne typy dotazov, ktoré by
 sme chceli mať na tieto reťazce a ako ich vieme implementovať s pomocou
-nájdeného $k$-nadslova. Pripomíname, že všetky dotazy budú zisťovať nejakú
+nájdeného $k$-nadslova.
+
+Spomenuté typy dotazov sú určené primárne na zisťovanie
+rôznych vlastností sady čítaní, preto množinu vstupných reťazcov budeme 
+nazývať \emph{čítania}. Pripomíname, že všetky dotazy budú zisťovať nejakú
 informáciu o podreťazcoch, ktoré sú dlhé nanajvýš $k$.
 
 \section{Prítomnosť podreťazca}
 
 Úplne najzákladnejšou otázkou, na ktorú chceme vedieť odpovedať, je prítomnosť
-nejakého podreťazca dĺžky najviac $k$ vo vstupných reťazcoch. Ako sa neskôr ukáže,
+nejakého podreťazca dĺžky presne $k$ vo vstupných čítaniach. Ako sa neskôr ukáže,
 vedieť odpovedať na takýto dotaz nám neskôr pomôže vybudovať dodatočné podporné
 štruktúry, pomocou ktorých budeme vedieť odpovedať aj na zložitejšie dotazy.
 
 Ako prvé je dôležité všimnúť si, že prítomnosť nejakého reťazca v $k$-nadslove
-nám nezaručuje, že sa vyskytoval aj v nejakom z pôvodných reťazcov. Vezmime si
-napríklad $k = 4$ a dva reťazce, \texttt{ACGA} a \texttt{ACGT}. Ich $k$-nadslovom
+nám nezaručuje, že sa vyskytoval aj v nejakom z pôvodných čítaní. Vezmime si
+napríklad $k = 4$ a dve čítania, \texttt{ACGA} a \texttt{ACGT}. Ich $k$-nadslovom
 môže byť napríklad reťazec \texttt{ACGACGT}, ktorý napríklad obsahuje aj
-podreťazec \texttt{CGAC}, ktorý sa nevyskytuje ani v jednom z pôvodných reťazcov.
+podreťazec \texttt{CGAC}, ktorý sa nevyskytuje ani v jednom z pôvodných čítaní.
 
 Pre tento účel mierne modifikujeme algoritmus na hľadanie $k$-nadslova tak, aby nám
 vedel pre každý znak výsledného $k$-nadslova povedať, či sa ním končí nejaká $k$-tica,
-ktorá sa vyskytuje v niektorom pôvodnom reťazci. To docielime jednoducho tak, že
+ktorá sa vyskytuje v niektorom pôvodnom čítaní. To docielime jednoducho tak, že
 pre každú hranu, ktorú budeme mať v našom grafe, si zapamätáme, či reprezentuje
 nutnú hranu, inými slovami povedané, či sa $k$-tica, ktorú reprezentuje, vyskytuje
-v niektorom zo vstupných reťazcov.
+v niektorom zo vstupných čítaní.
 
 Pri prepisovaní sledu na konkrétny reťazec si budeme zároveň vytvárať pole
 pravdivostných hodnôt, do ktorého pre každý znak, ktorý pripisujeme na koniec
@@ -36,23 +40,27 @@ nachádzala v niektorom vstupnom slove. Toto pole budeme nazývať \emph{poľom 
 Nakoniec potrebujeme pre každý dotazovaný podreťazec, kde sa nachádza v $k$-nadslove.
 Pre tento účel využijeme štruktúru FM-index \cite{fm_index}, konkrétne jeho implementáciu
 z knižnice SDSL \cite{sdsl}. Pomocou FM-indexu vieme zistiť, kde sa začínajú všetky
-výskyty nejakého podreťazca v $k$-nadslove v krátkom čase aj napriek tomu, že
-zaberá iba málo pamäte.
+výskyty nejakého podreťazca v $k$-nadslove v čase priamo úmernom súčtu dĺžky vyhľadávaného podreťazca
+a počtu výskytov. Napriek tomu zaberá pri dĺžke uloženého slova $m$ zhruba $m/2$
+bajtov.
 
 Na dotazovaný reťazec $r$ teda nájdeme všetky jeho začiatky v $k$-nadslove. Ak
 v poli výskytov nájdeme aspoň pre jeden koniec výskytu hodnotu $Pravda$, odpovieme
 tiež $Pravda$, v opačnom prípade odpovieme $Nepravda$.
 
 Aby sme čo najviac zmenšili veľkosť poľa výskytov, uložíme si ho skomprimované
-podľa techniky z článku Ramana, Ramana a Raa \cite{rrr_vector}. Používame implementáciu
-z SDSL.
+podľa techniky z článku Ramana, Ramana a Raa \cite{rrr_vector}. Takto zostrojené pole
+dĺžky $m$ s $n$ nastavenými bitmi má veľkosť $\beta(n, m) + o(n) + O(log log n)$ bitov,
+kde $\beta(n, m)$ je dolné teoretické obmedzenie na počet bitov potrebných na reprezentáciu
+$n$-prvkovej podmnožiny z $m$-prvkovej množiny, zároveň však vie zisťovať hodnotu na danej
+pozícii v konštantnom čase. Používame implementáciu z SDSL.
 
 \section{Počet výskytov podreťazca}
 
 Podobne, ako zisťovanie prítomnosti nejakého podreťazca, môžeme vyriešiť aj podporu
-pre dotazy, koľkokrát sa daný podreťazec nachádza vo vstupných reťazcoch. Jediný rozdiel
+pre dotazy, koľkokrát sa daný podreťazec nachádza v zadaných čítaniach. Jediný rozdiel
 bude v tom, že si pre každú nutnú hranu budeme pamätať, koľkokrát sa vyskytovala jej
-zodpovedajúca $k$-tica písmen na vstupe, pre nepovinné hrany si budeme pamätať nulu.
+zodpovedajúca $k$-tica písmen v čítaniach, pre nepovinné hrany si budeme pamätať nulu.
 
 Taktiež podobne ako pri dotazoch na prítomnosť si pre každý znak v $k$-nadslove
 budeme pamätať jednu hodnotu -- koľko $k$-tic zo vstupu sa končí týmto znakom. Toto
@@ -67,10 +75,21 @@ Keďže každú $k$-ticu pri konštruovaní
 reprezentujeme ako jednu nutnú hranu, práve jeden výskyt zodpovedá tejto hrane a
 je nenulový, ostatné musia byť nulové. Dôležité je však poznamenať, že takéto
 riešenie dotazu nemusí dávať správnu odpoveď pre dotazované reťazce kratšie ako $k$.
+Pre daný krátky podreťazec $r$ môžeme mať viacero výskytov, ktoré zodpovedajú
+nejakej nutnej hrane. Ak však sčítame počty výskytov týchto hrán, stále nemusíme
+započítať všetky výskyty, ktoré treba.
 
-Aby toto pole čísel nezaberalo oveľa viac pamäte, než samotný FM-index, uložíme
+Základným problémom sú výskyty na začiatkoch čítaní. Vezmime si napríklad nejaké čítanie $c$.
+Všetky výskyty nejakého podreťazca kratšieho než $k$, ktoré sa končia na $k$-tom, alebo
+neskoršom znaku čítania $c$, započítame správne, keďže pre ne existuje práve jedna $k$-tica,
+ktorá sa nimi končí a v nej tieto kratšie výskyty započítame. Pre výskyty, ktoré sa končia
+na skoršom mieste v čítaní $c$, neexistuje žiadna hrana, v ktorej by sme ich mohli
+započítať. Podobný problém nastáva aj pri zisťovaní prítomnosti podreťazca kratšieho, než $k$.
+
+Aby toto pole počtov výskytov nezaberalo oveľa viac pamäte, než samotný FM-index, uložíme
 si ho skomprimované pomocou prefixového kódovania \cite{integer_coding}, implementovaného
-s rýchlym náhodným prístupom v knižnici v SDSL \cite{sdsl}.
+s náhodným prístupom v konštantnom čase v knižnici v SDSL \cite{sdsl}. Prístup k nejakému
+prvku je vďaka vzorkovaniu poľa v konštantnom čase, aj keď pomalšie, než do bežného poľa.
 Experimenty ukázali, že skomprimované pole zaberá zhruba toľko miesta,
 čo FM-index.
 
@@ -98,7 +117,7 @@ v tejto $k$-tici. Nakoniec zlúčime všetky rovnaké začiatky vrámci jedného
 doplníme ich na koniec poľa začiatkov.
 
 Keďže jedna $k$-tica sa môže v $k$-nadslove nachádzať viackrát, spomedzi všetkých
-jej výskytov vtberieme ten, ktorý má na konci v poli výskytov hodnotu $Pravda$.
+jej výskytov vyberieme ten, ktorý má na konci v poli výskytov hodnotu $Pravda$.
 
 Každej $k$-tici z každého čítania teraz zodpovedá práve jeden začiatok v $k$-nadslove,
 viacerým $k$-ticiam môže zodpovedať ten istý. V poli správnych pozícií pre nejaký začiatok $z$
@@ -140,6 +159,9 @@ nenastal žiaden koniec správneho úseku.
 Očakávame, že takáto reprezentácia poľa správnych pozícií bude obsahovať iba
 málo hodnôt $Pravda$, na jej uloženie teda môžeme využiť vhodnú štruktúru pre
 riedke polia, $sdarray$ \cite{sdarray}, opäť použijeme implementáciu z SDSL.
+Na reprezentáciu poľa dĺžky $n$ s $m$ hodnotami potrebujeme $m\cdot(2 + \lceil log\frac{n}{m} \rceil )$
+bitov, počítanie $rank$ nám zaberie nanajvýš $O(log \frac{n}{m}) + O(\frac{log^4 m}{log n})$
+operácii, aj keď v praxi je táto operácia rýchlejšia.
 
 Aby sme vedeli rýchlo vyhľadávať, zavedieme si ešte jedno pole, ktoré bude
 obsahovať smerníky na začiatky, usporiadané podľa pozície začiatku. Pomocou
@@ -161,7 +183,16 @@ ktorých koniec má v poli výskytov hodnotu $Pravda$.
 Pre každý takýto výskyt binárne vyhľadáme najmenší začiatok, ktorý sa kryje s celým
 výskytom a overíme si v poli správnych pozícií, či nejde o falošný prekryv.
 Ak je prekryv naozaj pravý, pridáme čítanie, ktorému zodpovedal daný začiatok,
-do výsledku.
+do výsledku. Podobne ako pri počítaní výskytov budú nastávať problémy pre $r$
+kratšie než $k$.
+
+Časová zložitosť tohto dotazu závisí od vyhľadávania v FM-indexe, nájdenia
+prvého začiatku a následného
+kontrolovania potenciálnych začiatkov. Keďže očakávame, že v FM-indexe bude
+iba málo výskytov dotazovaného reťazca a prvý potenciálny začiatok binárne
+vyhľadávame, väčšina času vykonávania tohto dotazu bude plynúť z kontrolovania
+potenciálnych začiatkov. Časová zložitosť kontrolovania potenciálnych začiatkov
+je lineárne závislá od ich počtu.
 
 \subsection{Redukcia počtu začiatkov}
 
