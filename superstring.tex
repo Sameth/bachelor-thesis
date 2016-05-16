@@ -385,7 +385,8 @@ vlastnosť, nájdenie korektného sled je už len záležitosťou nájdenia Eule
 Pokiaľ nutný podgraf $k$-graf množiny $S$ túto vlastnosť nemá, potrebujeme čo najlacnejšie pridať hrany z vrcholov s 
 $d_O < d_I$ do vrcholov s $d_I < d_O$, pričom využívať môžeme aj nepovinné hrany.
 Z lemy \ref{shortest_edge_lemma} vyplýva, že najlacnejšia cesta medzi dvomi vrcholmi je hrana medzi
-nimi, čiže zaujímať nás budú iba hrany medzi vrcholmi. Z toho vyplýva aj konštrukcia nasledovného grafu.
+nimi, čiže zaujímať nás budú iba hrany medzi vrcholmi. Z toho vyplýva aj konštrukcia nasledovného grafu,
+ktorého schematické znázornenie uvádzame v obr. \ref{obr:toky}.
 
 \begin{defn}
     Nech $G$ je $k$-graf množiny $S$ a $G'$ je jeho nutný podgraf. Tokovým grafom grafu $G$
@@ -407,12 +408,24 @@ najlacnejšiemu možnému pridaniu hrán do nutného podgrafu $k$-grafu tak, aby
 kružnica. Jednoducho pre každý nasýtený vrchol $V$ a hladný vrchol $U$ pridáme $x$ hrán z $V$ do $U$,
 kde $x$ je veľkosť toku tečúca z vrchola $V$ do $U$.
 
+\begin{figure}
+
+\centerline{\includegraphics[width=0.6\textwidth]{images/toky-2.pdf}}
+
+\caption[Ukážka tokových grafov]{Ukážka tokových grafov. Naľavo je znázornený základný tokový graf, napravo je znázornený
+tokový graf s obmedzením maximálneho toku.}
+
+\label{obr:toky}
+
+\end{figure}
+
+
 Keďže náš korektný sled nemusí začínať aj končiť v tom istom vrchole, potrebujeme
 nájsť v skutočnosti najlacnejší tok, ktorý je o $1$ menší než maximálny a pridať hrany podľa neho.
 Takýto tok môžeme nájsť napríklad pomocou algoritmu Edmondsa a Karpa \cite{mincost_maxflow} v
 čase $O(n^3)$, kde $n$ je počet vrcholov v tokovom grafe nášho $k$-grafu, prípadne pomocou akéhokoľvek potenciálne rýchlejšieho
-algoritmu na dve simulácie, kde v tej druhej si vhodným pridaním jedného vrchola vieme vynútiť
-obmedzenie najväčšieho toku na hodnotu o jedna menšiu, než zistíme pri prvej simulácii.
+algoritmu na dve simulácie, kde v prvej zistíme hodnotu maximálneho toku a v druhej vhodným pridaním jedného vrchola vynútime
+obmedzenie najväčšieho toku na požadovanú hodnotu (obr. \ref{obr:toky}).
 
 Ako posledné nám teda stačí nájsť Eulerovský ťah v takto upravenom grafe a zrekonštruovať z neho
 nadslovo. Týmto sme si popísali polynomiálny algoritmus na hľadanie $k$-nadslova, pokiaľ je

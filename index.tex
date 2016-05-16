@@ -219,10 +219,22 @@ hranu $e_3 = (V_1, V_3)$. Spojiť môžeme samozrejme aj viacero hrán dohromady
 každú spojenú hranu si budeme pamätať postupnost pôvodných hrán, z ktorých sa
 skladá.
 
+\begin{figure}
+
+\centerline{\includegraphics[width=0.7\textwidth]{images/rozpadnutie-3-3.pdf}}
+
+\caption[Zvýšenie počtu komponentov]{Ukážkový príklad rozpadu grafu na komponenty
+pri spojení hrán.}
+
+\label{obr:rozpad}
+
+\end{figure}
+
 Jednou nevýhodou takejto operácie je, že môže zvýšiť počet komponentov v grafe.
 Ako jednoduchý príklad môže slúžiť graf pozostávajúci z dvoch cyklov, ktoré
 zdieľajú jeden vrchol $V$. Ak v jednom z týchto cyklov prepojíme hrany
 prechádzajúce cez $V$, pôvodne súvislý graf sa rozpadne na dva komponenty.
+Tento príklad sme znázornili na obr. \ref{obr:rozpad}.
 
 Spájať hrany môžeme viacerými spôsobmi, niektoré z nich môžu zaručiť, že sa
 nezvýši počet komponentov, niektoré môžu aj napriek zvýšeniu počtu komponentov
