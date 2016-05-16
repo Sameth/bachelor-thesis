@@ -1,7 +1,7 @@
 \chapter{Základné pojmy, motivácia a súvisiace práce}
 
 V tejto kapitole čiatateľa oboznámime so základnými biologickými
-a informatickými pojmami, s ktorými sa môže stretnúť v tejto práci, s cieľom práce
+a informatickými pojmami, s ktorými sa stretneme v tejto práci, s cieľom práce
 a s motiváciou pre riešenie tohto problému. Taktiež si spomenieme niekoľko
 prác súvisiacich s problematikou.
 
@@ -10,7 +10,7 @@ prác súvisiacich s problematikou.
 Genetická informácia všetkých známych bunkových organizmov je uložená v
 deoxyribonukleovej kyseline, skrátene nazývanej \emph{DNA}. Ide o zložitú molekulu
 pozostávajúcu z dvoch chemicky naviazaných polymérových vlákien stočených
-do špirálovej štruktúry. Základné molekuly, z ktorých sa tieto reťazce
+do špirálovej štruktúry. Základné stavebné prvky, z ktorých sa tieto reťazce
 skladajú, sa nazývajú nukleotidy. Každý nukleotid pozostáva
 z fosfátového zvyšku, deoxyribózy a dusíkatej bázy. Nukleotidy sa od seba líšia
 v dusíkatej báze, ktorá môže byť štyroch typov: adenín, guanín, tymín, cytozín.
@@ -20,10 +20,10 @@ S tým súvisí taktiež tzv. komplementárnosť týchto vlákien. Keď v jednom
 máme adenínový nukleotid, spojený je s tymínovým nukleotidom v druhom vlákne
 a naopak. Podobne sa guanínový nukleotid spája s cytozínovým.
 
-Celá genetická informácia v jednej molekule DNA je kódovaná v podstate iba usporiadaním nukleotidov,
+Celá genetická informácia v jednej molekule DNA je tak kódovaná v podstate iba usporiadaním nukleotidov,
 pre krátkosť sa toto usporiadanie zapisuje reťazcom pozostávajúcim
-zo znakov \verb_A_, \verb_G_, \verb_T_ a \verb_C_, každý znak zodpovedajúci
-príslušnej dusíkatej báze. Kvôli chemickej štruktúre vlákna DNA záleží aj,
+zo znakov \verb_A_, \verb_G_, \verb_T_ a \verb_C_, pričom každý znak zodpovedá
+príslušnej dusíkatej báze. Kvôli chemickej štruktúre vlákna DNA záleží aj na tom,
 v ktorom smere tento reťazec zapisujeme, čiže napr. reťazec \verb_GGA_ je
 zásadne odlišný od reťazca \verb_AGG_. Smery komplementárnych vlákien sú opačné.
 
@@ -33,13 +33,14 @@ nazývame súhrnne menom \emph{genóm}.
 
 \subsection{Sekvenovanie}
 
+Sekvenovanie je proces, ktorým získavame genóm príslušného organizmu.
 Väčšina sekvenovacích postupov má spoločné črty. Pomocou zložitých chemických
 a fyzikálnych procesov sa najprv zistí mnoho krátkych reťazcov, ktoré sa
 v reťazci DNA nachádzajú na vopred neznámych miestach. Tieto krátke reťazce
 sa nazývajú \emph{čítania}, z anglického \emph{read}.
 
 Z týchto čítaní sa potom pomocou rôznych algoritmov zisťuje, aký bol celý reťazec DNA.
-Tento proces, nazývaný skladanie sekvencií, je pomerne náročný, keďže čítania sa nachádzajú na neznámych miestach
+Tento proces, nazývaný \emph{skladanie sekvencií}, je pomerne náročný, keďže čítania sa nachádzajú na neznámych miestach
 v DNA a navyše, väčšina metód na ich zistenie má malú šancu pomýliť sa pri určovaní
 niektorého nukleotidu. Preto sa pri každej metóde sekvenovania generuje toľko čítaní, aby
 v priaznivom prípade mnohonásobne pokryli celý reťazec DNA. Očakávaný počet, koľkokrát
@@ -48,16 +49,16 @@ z anglického \emph{coverage}.
 
 \subsection{Indexácia čítaní}
 
-Pokiaľ máme k dispozícii DNA reťazec nejakého jedinca, môže nás zaujímať, koľko, prípadne
+Pokiaľ máme k dispozícii DNA reťazec nejakého jedinca, môže nás zaujímať, koľko a prípadne
 ktoré čítania sa prekrývajú s nejakou časťou. Pomocou takýchto dotazov vieme zisťovať
 mnohé zaujímavé informácie. Jednou možnosťou je napríklad hľadať rozdiely medzi
 jedincami jedného druhu, inou je zisťovať, ktoré časti DNA majú akú funkciu, prípadne
-ktoré majú vôbec nejakú. Pre prípady, kedy máme k dispozícii referenčnej sekvencii živočíšneho
+ktoré majú vôbec nejakú. Pre prípady, kedy máme k dispozícii referenčnú sekvenciu živočíšneho
 druhu, existujú efektívne štruktúry, ktoré vedia na dané dotazy odpovedať.
 
 V mnohých prípadoch však referenčnú sekvenciu k dispozícii nemáme, napriek tomu by sme
 radi vedeli odpovedať na podobné otázky. Jedno možné využitie štruktúry, ktorá vie
-odpovedať na takýto typ dotazov, môže byť využité aj v niektorých algoritmoch na
+odpovedať na takýto typ dotazov, je aj v niektorých algoritmoch na
 skladanie sekvencií, napríklad GAML \cite{gaml}.
 
 V práci Philippe, Salsona a kol. \cite{gk_arrays} sa spomína sedem bežných typov otázok,
@@ -82,9 +83,9 @@ vyhľadávajú podreťazce s pomocou upravených sufixových polí nad zreťazen
 Myšlienku Gk-arrays posunuli ďalej Välimäki a Rivals, keď prišli s komprimovanou
 verziou \cite{comp_gk_arrays}.
 
-S myšlienkovo odlišným riešením prišli Boža a Jursa. Namiesto zreťazenia čítaní v
-ich CR-indexe \cite{cr_index} nájdu nadslovo všetkých čítaní, nájdu pozícíe všetkých
-čítaní v tomto nadslove a pomocou toho odpovedajú na rôzne dotazy. Keďže čítania sú v zamýšľanom použití podreťazcami celého
+S myšlienkovo odlišným riešením prišli Boža a Jursa. Namiesto zreťazenia čítaní použili
+v CR-indexe \cite{cr_index} nadslovo všetkých čítaní, v ktorom nájdu pozície všetkých čítaní
+a pomocou toho odpovedajú na rôzne dotazy. Keďže čítania sú v zamýšľanom použití podreťazcami celého
 genómu s malou šancou chýb, očakávaná dĺžka ich nadslova je zhruba veľkosť genómu.
 
 \section{Ciele práce}
@@ -96,7 +97,7 @@ prekryvmi s inými čítaniami.
 
 Na druhú stranu, existujú nástroje, ktorými sa dá väčšina chýb v čítaniach zdetekovať
 a odstrániť. V CR-indexe pomocou takýchto nástrojov väčšinu chýb opravia a nadslovo
-hľadajú k opraveným čítaniam. Keďže si chcú zachovať korektnosť, chyby ukladajú tak
+hľadajú k opraveným čítaniam. Keďže si chcú zachovať korektnosť, chyby ukladajú tak,
 že pre každú pozíciu každého čítania vedia povedať, či sa oproti časti nadslova,
 ku ktorej je čítanie zarovnané, líši.
 
@@ -124,7 +125,7 @@ Jednou z centrálnych definícií bude pojem $k$-nadslova.
 \begin{defn}
     Nech $k > 1$ je celé číslo. Nech $\Sigma$ je nejaká abeceda a nech $S$ je množina
     slov dlhých aspoň $k$ nad abecedou $\Sigma$. Potom $k$-nadslovom množiny $S$ nazveme také slovo
-    nad abecedou $\Sigma$, pre ktoré platí, že každé podslovo nejakého slova z $S$ je
+    nad abecedou $\Sigma$, pre ktoré platí, že každé podslovo dĺžky $k$ nejakého slova z $S$ je
     zároveň podslovom $k$-nadslova.
 \end{defn}
 
