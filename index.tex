@@ -1,27 +1,26 @@
 \chapter{Indexácia $k$-nadslova}
 
 V predošlej kapitole sme si popísali, ako vieme nájsť $k$-nadslovo k nejakej
-množine reťazcov. V tejto kapitole si popíšeme rôzne typy dotazov, ktoré by
-sme chceli mať na tieto reťazce a ako ich vieme implementovať s pomocou
-nájdeného $k$-nadslova.
+množine reťazcov. V tejto kapitole si popíšeme rôzne typy dotazov, ktoré
+vieme implementovať s pomocou nájdeného $k$-nadslova.
 
 Spomenuté typy dotazov sú určené primárne na zisťovanie
 rôznych vlastností sady čítaní, preto množinu vstupných reťazcov budeme 
 nazývať \emph{čítania}. Pripomíname, že všetky dotazy budú zisťovať nejakú
-informáciu o podreťazcoch, ktoré sú dlhé nanajvýš $k$.
+informáciu o podreťazcoch, ktoré sú dlhé práve $k$.
 
 \section{Prítomnosť podreťazca}
 
 Úplne najzákladnejšou otázkou, na ktorú chceme vedieť odpovedať, je prítomnosť
 nejakého podreťazca dĺžky presne $k$ vo vstupných čítaniach. Ako sa neskôr ukáže,
-vedieť odpovedať na takýto dotaz nám neskôr pomôže vybudovať dodatočné podporné
+vedieť odpovedať na takýto dotaz nám pomôže vybudovať dodatočné podporné
 štruktúry, pomocou ktorých budeme vedieť odpovedať aj na zložitejšie dotazy.
 
 Ako prvé je dôležité všimnúť si, že prítomnosť nejakého reťazca v $k$-nadslove
 nám nezaručuje, že sa vyskytoval aj v nejakom z pôvodných čítaní. Vezmime si
 napríklad $k = 4$ a dve čítania, \texttt{ACGA} a \texttt{ACGT}. Ich $k$-nadslovom
-môže byť napríklad reťazec \texttt{ACGACGT}, ktorý napríklad obsahuje aj
-podreťazec \texttt{CGAC}, ktorý sa nevyskytuje ani v jednom z pôvodných čítaní.
+môže byť napríklad reťazec \texttt{ACGACGT}, ktorý síce obsahuje aj
+podreťazec \texttt{CGAC}, no ten sa nevyskytuje ani v jednom z pôvodných čítaní.
 
 Pre tento účel mierne modifikujeme algoritmus na hľadanie $k$-nadslova tak, aby nám
 vedel pre každý znak výsledného $k$-nadslova povedať, či sa ním končí nejaká $k$-tica,
@@ -37,7 +36,7 @@ prichádza z nutnej hrany. Prvých $k-1$ znakov, preklad prvého vrchola, dostan
 hodnotu $Pravda$, keďže každý vrchol predstavuje $k-1$-ticu znakov, ktorá sa
 nachádzala v niektorom vstupnom slove. Toto pole budeme nazývať \emph{poľom výskytov}.
 
-Nakoniec potrebujeme pre každý dotazovaný podreťazec, kde sa nachádza v $k$-nadslove.
+Nakoniec potrebujeme pre každý dotazovaný podreťazec určiť, kde sa nachádza v $k$-nadslove.
 Pre tento účel využijeme štruktúru FM-index \cite{fm_index}, konkrétne jeho implementáciu
 z knižnice SDSL \cite{sdsl}. Pomocou FM-indexu vieme zistiť, kde sa začínajú všetky
 výskyty nejakého podreťazca v $k$-nadslove v čase priamo úmernom súčtu dĺžky vyhľadávaného podreťazca
@@ -57,12 +56,12 @@ pozícii v konštantnom čase. Používame implementáciu z SDSL.
 
 \section{Počet výskytov podreťazca}
 
-Podobne, ako zisťovanie prítomnosti nejakého podreťazca, môžeme vyriešiť aj podporu
+Podobne ako zisťovanie prítomnosti nejakého podreťazca môžeme vyriešiť aj podporu
 pre dotazy, koľkokrát sa daný podreťazec nachádza v zadaných čítaniach. Jediný rozdiel
 bude v tom, že si pre každú nutnú hranu budeme pamätať, koľkokrát sa vyskytovala jej
-zodpovedajúca $k$-tica písmen v čítaniach, pre nepovinné hrany si budeme pamätať nulu.
+zodpovedajúca $k$-tica písmen v čítaniach; pre nepovinné hrany si budeme pamätať nulu.
 
-Taktiež podobne ako pri dotazoch na prítomnosť si pre každý znak v $k$-nadslove
+Podobne ako pri dotazoch na prítomnosť si pre každý znak v $k$-nadslove
 budeme pamätať jednu hodnotu -- koľko $k$-tic zo vstupu sa končí týmto znakom. Toto
 pole budeme ďalej nazývať poľom počtu výskytov.
 
@@ -75,7 +74,7 @@ Keďže každú $k$-ticu pri konštruovaní
 reprezentujeme ako jednu nutnú hranu, práve jeden výskyt zodpovedá tejto hrane a
 je nenulový, ostatné musia byť nulové. Dôležité je však poznamenať, že takéto
 riešenie dotazu nemusí dávať správnu odpoveď pre dotazované reťazce kratšie ako $k$.
-Pre daný krátky podreťazec $r$ môžeme mať viacero výskytov, ktoré zodpovedajú
+Pre daný podreťazec $r$ kratší než $k$ môžeme mať viacero výskytov, ktoré zodpovedajú
 nejakej nutnej hrane. Ak však sčítame počty výskytov týchto hrán, stále nemusíme
 započítať všetky výskyty, ktoré treba.
 
@@ -90,16 +89,16 @@ Aby toto pole počtov výskytov nezaberalo oveľa viac pamäte, než samotný FM
 si ho skomprimované pomocou prefixového kódovania \cite{integer_coding}, implementovaného
 s náhodným prístupom v konštantnom čase v knižnici v SDSL \cite{sdsl}. Prístup k nejakému
 prvku je vďaka vzorkovaniu poľa v konštantnom čase, aj keď pomalšie, než do bežného poľa.
-Experimenty ukázali, že skomprimované pole zaberá zhruba toľko miesta,
+Experimenty ukázali, že takto skomprimované pole zaberá zhruba toľko miesta,
 čo FM-index.
 
 \section{Čítania s podreťazcom}
 
 Posledný typ dotazu, na ktorý sa pozrieme, bude pre daný podreťazec zistiť, v
 ktorých čítaniach sa nachádza. Ako uvidíme neskôr, podobne budeme vedieť zistiť
-aj to, kde sa v daných čítaniach nachádzal.
+aj to, kde sa v daných čítaniach nachádza.
 
-Základnou myšlienkou nášho riešenia je, podobne ako v CR-indexe, uložiť si
+Základnou myšlienkou nášho riešenia je, podobne ako v CR-indexe \cite{cr_index}, uložiť si
 začiatky jednotlivých čítaní. Keďže sa rôzne $k$-tice z čítania môžu nachádzať
 na rôznych miestach, pre každé čítanie môžeme mať týchto počiatočných pozícií viacero.
 Keď si nejaké konkrétne čítanie priložíme na nejakú pozíciu v $k$-nadslove,
@@ -107,8 +106,8 @@ nie všetky jeho znaky sa budú zhodovať s nadslovom.
 
 Informáciu o tom, ktoré pozície čítania sa zhodujú s nadslovom, si budeme ukladať
 do jedného poľa pravdivostných hodnôt, nazvime ho pole správnych pozícií. Pre jednoduchosť budeme predpokladať, že
-každé čítanie má rovnakú dĺžku, $q$. Pre každý začiatok nejakého prekryvu si
-vyhradíme $q$ hodnôt, každá označujúc, či sa znak na zodpovedajúcom mieste zhoduje.
+každé čítanie má rovnakú dĺžku $q$. Pre každý začiatok nejakého prekryvu si
+vyhradíme $q$ hodnôt, pričom každá z nich označuje, či sa znak na zodpovedajúcom mieste zhoduje s príslušným čítaním.
 
 Zistiť začiatky a pole správnych pozícií je pomerne priamočiare. Znova prejdeme cez všetky čítania. 
 Pre každú $k$-ticu si zistíme, kde sa nachádza v $k$-nadslove pomocou FM-indexu.
@@ -124,7 +123,7 @@ viacerým $k$-ticiam môže zodpovedať ten istý. V poli správnych pozícií p
 teda označíme za správne pozície iba tie, ktoré zodpovedajú nejakej $k$-tici, pre ktorú sme
 začiatok $z$ vytvorili.
 
-Nakoniec, namiesto toho, aby sme si ukladali pre každú pozíciu z čítania samostatnú pravdivostnú
+Nakoniec namiesto toho, aby sme si ukladali pre každú pozíciu z čítania samostatnú pravdivostnú
 hodnotu, využijeme vlastnosť, že pre každú začiatočnú pozíciu budú
 správne pozície v poli správnych pozícií s vysokou pravdepodobnosťou pri sebe a že každá správna pozícia je
 v súvislom bloku s aspoň $k-1$ ďalšími. Pre každý súvislý blok správnych hodnôt si
@@ -145,14 +144,14 @@ $\texttt{110110111001}$, kde $\texttt{1}$ reprezentuje hodnotu $Pravda$.}
 \end{figure}
 
 
-Ak chceme pre nejaký začiatok $z$, ktorý je $i$-ty spomedzi začiatkov, a pre nejaký
-úsek pozícii od $x$ po $x+c$ v tomto začiatku zistiť, či je tento úsek správny,
+Ak chceme pre $i$-ty začiatok $z$ a pre nejaký
+úsek pozícií od $x$ po $x+c$ v tomto začiatku zistiť, či je tento úsek správny,
 stačí nám overiť si dve vlastnosti:
 \begin{enumerate}
     \item $rank(i*(q+1) + x) \equiv 1 \pmod{2}$
     \item $rank(i*(q+1) + x) = rank(i*(q+1) + x + c)$
 \end{enumerate}
-Prvou z týchto vlastností si zaručíme, že pozícia $x$ je naozaj správna, druhou si
+Prvou z týchto požiadaviek zaručíme, že pozícia $x$ je naozaj správna, druhou
 zaručíme, že medzi $x$ a $x + c$ sú tiež všetky pozície správne, keďže v nich
 nenastal žiaden koniec správneho úseku.
 
@@ -172,7 +171,7 @@ Aby sme vedeli povedať, ktorému čítaniu zodpovedá nejaký začiatok, zavedi
 si nové pole pravdivostných hodnôt. Toto pole bude rovnako dlhé ako pole začiatkov
 a hodnotu $Pravda$ bude mať pri prvom začiatku každého čítania. Dôležité je uvedomiť
 si, že začiatky vytvárame postupne pre prvé čítanie, potom pre druhé, atď.
-Pre $i$-ty začiatok zistíme, ktorému čítaniu zodpovedá, ako $rank(i)$ v tomto novom poli.
+Pre $i$-ty začiatok zistíme, ktorému čítaniu zodpovedá, pomocou $rank(i)$ v tomto novom poli.
 
 \subsection{Riešenie dotazu}
 
@@ -196,13 +195,12 @@ je lineárne závislá od ich počtu.
 
 \subsection{Redukcia počtu začiatkov}
 
-Veľkosť všetkých pomocných štruktúr, ktoré potrebujeme pre zistenie, ktoré
-čítania obsahovali daný podreťazec, spoločne s časom vykonávania tohto
-dotazu, je úzko späté s počtom začiatkov, ktoré si ukladáme. V tejto
+Veľkosť všetkých týchto pomocných štruktúr a čas vykonávania
+dotazu sú úzko späté s počtom začiatkov, ktoré si ukladáme. V tejto
 časti si popíšeme, ako budeme ešte počas vytvárania $k$-nadslova zmenšovať
 počet týchto začiatkov.
 
-Toto vieme docieliť tak, že vo výslednom korektnom slede v $k$-grafe vstupnej
+Vo výslednom korektnom slede v $k$-grafe vstupnej
 množiny slov budeme preferovať, aby niektoré hrany boli použité priamo po sebe.
 Pokiaľ máme napríklad pri $k = 3$ vstupné slovo \verb_AGGC_, budeme preferovať,
 aby po hrane z vrchola \verb_(AG)_ do \verb_(GG)_ nasledovala hrana z \verb_GG_
@@ -211,18 +209,18 @@ podreťazec \verb_AGGC_, čiže $k$-tice \verb_AGG_ a \verb_GGC_ budú mať ten 
 začiatok.
 
 Keďže samotné rýchle hľadanie Eulerovského ťahu v grafe sa ťažko prispôsobuje
-preferovaniu nejakej následnosti hrán, namiesto toho si zavedieme jednoduchú
+preferovaniu nejakej následnosti hrán, zavedieme si jednoduchú
 operáciu spájania hrán na grafe, ktorú budeme vykonávať ešte pred hľadaním ťahu. Pokiaľ
 máme hrany $e_1 = (V_1, V_2)$ a $e_2 = (V_2, V_3)$ a preferujeme, aby $e_2$
 nasledovala po $e_1$, môžeme obe hrany z grafu odstrániť a pridať namiesto nich \emph{spojenú}
 hranu $e_3 = (V_1, V_3)$. Spojiť môžeme samozrejme aj viacero hrán dohromady. Pre
-každú spojenú hranu si budeme pamätať, z postupnosti akých pôvodných hrán sa
+každú spojenú hranu si budeme pamätať postupnost pôvodných hrán, z ktorých sa
 skladá.
 
-Jednou nevýhodou takejto operácie je, že môže zvýšiť počet komponentov v grafe,
-ako jednoduchý príklad môžu slúžiť graf pozostávajúci z dvoch cyklov, ktoré
+Jednou nevýhodou takejto operácie je, že môže zvýšiť počet komponentov v grafe.
+Ako jednoduchý príklad môže slúžiť graf pozostávajúci z dvoch cyklov, ktoré
 zdieľajú jeden vrchol $V$. Ak v jednom z týchto cyklov prepojíme hrany
-prechádzajúce cez $V$, v pôvodne súvislom grafe ostanú dva komponenty.
+prechádzajúce cez $V$, pôvodne súvislý graf sa rozpadne na dva komponenty.
 
 Spájať hrany môžeme viacerými spôsobmi, niektoré z nich môžu zaručiť, že sa
 nezvýši počet komponentov, niektoré môžu aj napriek zvýšeniu počtu komponentov
@@ -232,7 +230,7 @@ komponentov a za každý rozpad sa nám $k$-nadslovo predĺži najviac o $k-1$ z
 
 Základný algoritmus nadpájania hrán, ktorý používame, bude nasledovný:
 \begin{enumerate}
-    \item Prejdi cez všetky vstupné slová, pre každú dvojicu hrán $e_1$ a $e_2$, ktoré
+    \item Prejdi cez všetky vstupné slová a pre každú dvojicu hrán $e_1$ a $e_2$, ktoré
           môžu ísť po sebe zisti, v koľkých vstupných slovách naozaj idú po sebe.\\
           Túto hodnotu označíme ako skóre spojenia hrán $e_1$ a $e_2$.
     \item V každom vrchole grafu nájdi párovanie hrán s najväčším súčtom skóre. Z
