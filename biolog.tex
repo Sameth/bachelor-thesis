@@ -136,13 +136,18 @@ na pozíciách od nuly po $i$ vrátane.
 V tejto práci budeme taktiež používať orientované grafy. Pod pojmom orientovaný graf $G$ budeme
 rozumieť dvojicu $(V, E)$, kde $V$ je množina vrcholov a $E$ je množina usporiadaných
 dvojíc $(v_1, v_2)$, kde $v_1$ aj $v_2$ sú vrcholmi grafu. Budeme hovoriť, že hrana $e$ vedie
-z vrchola $v_1$ do vrchola $v_2$, pokiaľ $e = (v_1, v_2)$.
+z vrchola $v_1$ do vrchola $v_2$, pokiaľ $e = (v_1, v_2)$. Za slučku označíme každú hranu idúcu z vrchola
+do neho samého, čiže každú hranu typu $(v, v)$.
 
 Pre graf $G$ budeme používať $V(G)$ na označenie jeho množiny vrcholov a $E(G)$ na označenie jeho
 množiny hrán. Pod množinou výstupných hrán
 vrchola $v$ budeme rozumieť množinu $out(v) = \{ (v, v_2) | v_2 \in V(G) \}$ a podobne,
 pod množinou vstupných hrán budeme rozumieť množinu $in(v) = \{ (v_1, v) | v_1 \in V(G) \}$.
 Pre vrchol $v$ určíme jeho výstupný stupeň ako $d_O(v) = |out(v)|$ a jeho vstupný stupeň ako $d_I(v) = |in(v)|$.
+
+Za podgraf grafu $G$ označíme ľubovoľný graf $G'$ taký, že $V(G') \subseteq V(G)$ a zároveň $E(G') \subseteq E(G)$.
+Za faktorový podgraf grafu $G$ označíme taký podgraf $G'$, ktorý obsahuje všetky vrcholy $G$, čiže
+$V(G) = V(G')$.
 
 V prípade, že budeme hovoriť o viacerých grafoch a z kontextu nie je jasné, na ktorý z nich
 sa niektorý z pojmov vzťahuje, tento graf zadefinujeme v hornom indexe, napríklad

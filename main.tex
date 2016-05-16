@@ -26,7 +26,7 @@
 \def\mfnazov{Efektívna reprezentácia množiny krátkych reťazcov}
 \def\mftyp{Bakalárska práca}
 \def\mfautor{Jaroslav Petrucha}
-\def\mfskolitel{Mgr. Tomáš Vinař, PhD. }
+\def\mfskolitel{Mgr. Tomáš Vinař, PhD.}
 
 %ak mate konzultanta, odkomentujte aj jeho meno na titulnom liste
 \def\mfkonzultant{tit. Meno Priezvisko, tit. }  
@@ -140,9 +140,15 @@ Fakulta matematiky, fyziky a informatiky
 \newpage 
 \section*{Abstrakt}
 
-Abstrakt
+Pri hľadaní sekvencie DNA nejakého organizmu začíname vo väčšine prípadov s krátkymi podreťazcami
+tejto sekvencie, ktoré nazývame čítania. V tejto práci predstavujeme novú
+štruktúru na indexáciu týchto čítaní s nízkymi pamäťovými nárokmi
+za pomoci špeciálneho nadslova.
+Táto štruktúra vie odpovedať na otázky, koľké, resp. ktoré čítania obsahujú
+ako podreťazec daný reťazec dĺžky $k$. Hodnota $k$ je pre inštanciu štruktúry
+nemenná a musí byť daná vopred.
 
-\paragraph*{Kľúčové slová:} Kľučové slovo
+\paragraph*{Kľúčové slová:} čítania, nadslovo, index čítaní, DeBruijnov graf
 % --- Koniec Abstrakt - Slovensky
 
 
@@ -152,9 +158,14 @@ Abstrakt
 \newpage 
 \section*{Abstract}
 
-Abstract
+When discovering the DNA sequence for an organism, we often begin with a collection
+of short substrings of the sequence called reads. In this thesis, we present a new
+structure for read indexation with low memory footprint using a special kind of
+superstring. This structure can answer queries about the number or identifiers
+of reads containing a given string of length $k$ as substring. The value of $k$
+is constant for an instance of the structure and must be given beforehand.
 
-\paragraph*{Keywords:} Keywords
+\paragraph*{Keywords:} reads, superstring, read indexing, DeBruijn graph
 
 % --- Koniec Abstrakt - Anglicky
 
