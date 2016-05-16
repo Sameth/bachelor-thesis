@@ -2,7 +2,8 @@
 \addcontentsline{toc}{chapter}{Záver}
 
 V tejto práci sme sa zaoberali indexáciou potenciálne veľkej sady
-čítaní. Základným prístupom k problému bolo nájdenie $k$-nadslova
+čítaní tak, aby bolo možné vyhodnocovať dotazy na podreťazce dĺžky presne $k$.
+Základným prístupom k problému bolo nájdenie $k$-nadslova
 k čítaniam a vytvorenie pomocných polí a štruktúr, aby sme vedeli
 odpovedať na dotazy o pôvodných čítaniach.
 
@@ -15,28 +16,31 @@ Taktiež sme si popísali, ako vieme s využitím náhody nájsť nejaké
 o málo dlhšie nadslovo v čase lineárne závislom od veľkosti $k$-grafu.
 
 Pri indexácii sme si popísali tri základné typy dotazov, na ktoré vieme
-s využitím $k$-nadslova odpovedať, zároveň spomenuté dotazy považujeme
-za rozumné pokrytie dotazov, ktoré sa s pomocou $k$-nadslova dajú spracovávať.
+s využitím $k$-nadslova odpovedať.
 Podobne ako spomenuté dotazy vieme riešiť aj zvyšné dotazy spomenuté v
 článku N. Philippe a kol. \cite{gk_arrays}, spomenuté v prvej kapitole
 tejto práce:
 \begin{enumerate}
-    \item Túto otázku sme riešili priamo v práci.
-    \item Túto otázku vieme riešiť podobne, ako počet výskytov podreťazca
+    \item Ktoré čítania obsahujú daný podreťazec $f$? \\
+          Túto otázku sme riešili priamo v práci v sekcii \ref{sekcia:index_ktore}.
+    \item Koľko čítaní obsahuje daný podreťazec $f$? \\
+          Túto otázku vieme riešiť podobne, ako počet výskytov podreťazca
           v čítaniach, stačí odlišne vypočítať pole počtov výskytov.
-    \item Táto otázka sa dá zodpovedať pomocou rovnakých štruktúr, ako prvá.
+    \item Na ktorých pozíciach v čítaniach sa nachádza daný podreťazec $f$? \\
+          Táto otázka sa dá zodpovedať pomocou rovnakých štruktúr, ako prvá.
           Pri počítaní si nebudeme ukladať iba, ktoré čítanie sme práve našli,
           uložíme si aj pozíciu v ňom.
-    \item Túto otázku sme riešili piamo v práci.
+    \item Koľkokrát sa dohromady vyskytuje daný podreťazec $f$ v čítaniach? \\
+          Túto otázku sme riešili piamo v práci v sekcii \ref{sekcia:index_pocet}.
 \end{enumerate}
 
-Zvyšné otázky sú len modifikáciou prvých štyroch, keď nás zaujímajú iba čítania,
-ktoré daný podreťazec obsahujú iba raz. Tie vieme spracovať úplne rovnako, stačí
-vhodne prispôsobiť polia a trošku inak zapracovať čítania do pomocných polí.
+Zvyšné dotazy sú len modifikáciou prvých štyroch, keď nás zaujímajú iba čítania,
+ktoré daný podreťazec obsahujú iba raz. Takéto dotazy vieme spracovať s pomocou
+malých prispôsobení navrhovaných dátových štruktúr.
 
-Nakoniec samotné testovanie našej štruktúry ukázalo, že naša štruktúra je pre
-väčšie $k$ na nejakých dátach efektívnejšia než CR-index \cite{cr_index}, zatiaľčo pre menšie $k$
-je od neho horšia. Na niektorých dátach sa ukazalo, že naša štruktúra síce zaberá
+Testovanie našej štruktúry ukázalo, že naša štruktúra je pre
+väčšie $k$ efektívnejšia než CR-index \cite{cr_index}, zatiaľ čo pre menšie $k$
+je od neho horšia. Na dátach pochádzajúcich zo sekvenovania s väčšou chybovosťou naša štruktúra síce zaberá
 o niečo viac pamäte, ale dotazy vie spracovávať rýchlejšie.
 
 V tejto práci sme neriešili chyby v čítaniach, keďže vieme odhadnúť, že každá
@@ -50,6 +54,11 @@ ktoré mohli vzniknúť ako oprava nejakého čítania, ktoré pôvodne $r$ obsa
 Druhým z nich je odpovedanie na otázky o počte výskytov. Keďže niektoré $k$-tice
 sú uložené v pozmenenej podobe, je nutné aj pri počítaní overovať jednotlivé
 čítania.
+
+Malým problémom, ktorý sme nepreskúmali je spôsob, akým sa dá vysporiadať sa
+s dotazmi na podreťazce kratšie ako $k$. Keďže jediný problém spôsobujú začiatky
+čítaní, jedno možné riešenie by mohlo využívať nejako vhodne reprezentované
+pozície, na ktorých sa nachádza prvá $k$-tica z nejakého čítania.
 
 Ďalším problémom do budúcnosti je otázka, či neexistuje ešte iný spôsob, ako
 sformulovanť nadslovo, s pomocou ktorého by sa dali implementovať
