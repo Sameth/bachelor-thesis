@@ -1,24 +1,23 @@
 \chapter{Výsledky a porovnanie}
 
 V tejto kapitole sa pozrieme na výkonnosť nášho riešenia v porovnaní
-s CR-indexom. Testovanie prebehlo na tom istom počítači s procesorom
+s CR-indexom. Testovanie prebehlo na počítači s procesorom
 Intel Xeon CPU E5-2670 taktovaným na $2.60 GHz$.
 
 Pre účely testovania sme používali dve sady vstupných dát. Prvou sadou sú
 čítania získané nástrojom MiSeq z baktérie E.coli, kmeňa MG1655
 získané od spoločnosti Illumina. Dĺžka genómu tejto baktérie je 4.7 miliónov bázových párov, čítania
-majú viac akoako
-stoosemdesiatnásobné pokrytie a chybovosť $0.75\%$. Druhú sadu tvoria čítania zo štrnásteho ľudského
+majú viac ako $180\times$ pokrytie a chybovosť $0.75\%$. Druhú sadu tvoria čítania zo štrnásteho ľudského
 chromozómu, získané z projektu GAGE \cite{gage}. Celková dĺžka reťazca je 107 miliónov bázových párov,
 čítania majú štyridsaťdvanásobné pokrytie a chybovosť $1.5\%$.
 
-Okrem týchto dvoch sád čítaní sme použili aj čítania náhodne generované z osekvenovaného
+Okrem týchto dvoch sád čítaní sme použili aj simulované čítania náhodne generované z osekvenovaného
 genómu baktérie E.coli s rôznou dĺžkou aj chybovosťou.
 
 Testovali sme rýchlosť hľadania čítaní s daným podreťazcom a veľkosť štruktúr, ktoré potrebujeme pre odpovedanie
 na takéto dotazy za rôznych podmienok. Pokiaľ nie je povedané inak, hodnota $k$ je $20$.
 
-Podreťazce pre dotazy sme vygenerovali tak, aby $95\%$ podreťazcov
+Podreťazce pre dotazy sme generovali tak, aby $95\%$ podreťazcov
 pochádzalo z náhodných čítaní a zvyšných $5\%$ boli úplne náhodné reťazce.
 
 \begin{figure}
@@ -36,10 +35,10 @@ bez chýb.}
 
 \section{Generované dáta}
 
-Ako prvé si ukážeme naše simulované vstupné sady na obr. \ref{chart:artificial}. Ako prvé sme
+Obrázok \ref{chart:artificial} prezentuje výsledky pre simulované dáta. Ako prvé sme
 generovali čítania dĺžky $120$ s rôznou šancou na chybné určenie bázy. Čítania mali
-päťdesiatnásobné pokrytie. Ako druhé sme generovali čítania s rôznym pokrytím bez chýb.
-Ako posledné sme generovali čítania s päťdesiatnásobným pokrytím líšiace sa v dĺžke
+$50\times$ pokrytie. Ako druhé sme generovali čítania s rôznym pokrytím bez chýb.
+Na záver sme generovali čítania s $50\times$ pokrytím, líšiace sa v dĺžke
 čítaní.
 
 V prvej dvojici
@@ -67,8 +66,8 @@ riešenie dotazu sú malé a vysvetľujeme si ich ako náhodný šum.
 \caption[E.coli dáta s rôznym $k$]{Výsledky testovania na čítaniach baktérie E.coli pre rôzne $k$.
 V prvých dvoch tabuľkách je znázornený vplyv hodnoty $k$ na
 pamäťové nároky štruktúry a čas spracovávania dotazu. V treťej tabuľke sú znázornené veľkosti
-jednotlivých polí a štruktúr, ktoré používame, v závislosti od $k$ pri $40$-násobnom pokrytí,
-v štvrtej pri $100$-násobnom pokrytí. Kvôli veľkému rozsahu nameraných hodnôt sú veľkosti
+jednotlivých polí a štruktúr, ktoré používame, v závislosti od $k$ pri $40\times$ pokrytí,
+v štvrtej pri $100\times$ pokrytí. Kvôli veľkému rozsahu nameraných hodnôt sú veľkosti
 aj čas udávané v logaritmickej škále.}
 
 \label{chart:difks}
@@ -77,18 +76,18 @@ aj čas udávané v logaritmickej škále.}
 
 \section{Rôzne $k$}
 
-Na druhej sade testov si ukážeme, aký vplyv má hodnota $k$ na veľkosť a rýchlosť celej štruktúry na obr. \ref{chart:difks}.
-Tentokrát sme použili podmnožinu čítaní pre baktériu E.coli so štyridsať- a stonásobným pokrytím.
+Na druhej sade testov si ukážeme, aký vplyv má hodnota $k$ na veľkosť a rýchlosť celej štruktúry (obr. \ref{chart:difks}).
+Tentokrát sme použili podmnožinu čítaní pre baktériu \emph{E.coli} so $40\times$ a $100\times$ pokrytím.
 
 Pre malé hodnoty $k$ máme vysokú pravdepodobnosť, že sa rôzne časti genómu budú zhodovať v $k$-ticiach.
-Dôsledok môžeme pozorovať v tabuľkách. Zatiaľčo dĺžka $k$-nadslova je rekordne malá, jednotlivé
+Zatiaľ čo dĺžka $k$-nadslova je rekordne malá, jednotlivé
 čítania sú roztrúsené po tomto $k$-nadslove, čo má za efekt veľmi veľký počet začiatkov.
 
 Pre rastúce
 $k$ spočiatku rastie dĺžka nadslova, až sa pri $k \ge 15$ ustáli na takmer rovnakej hodnote. Zároveň
 môžeme pozorovať, že pre $k \ge 16$ sa takmer vôbec nemení ani počet začiatkov. Tento fakt si
 vysvetľujeme tak, že pre takéto $k$ začína $k$-nadslovo pomerne dobre reprezentovať celý genóm
-E.coli. Rovnako ako s rastúcim $k$ klesá počet začiatkov, klesá aj čas spracovávania dotazu, čo len
+\emph{E.coli}. Rovnako ako s rastúcim $k$ klesá počet začiatkov, klesá aj čas spracovávania dotazu, čo len
 potvrdzuje, že táto rýchlosť závisí od počtu skontrolovaných potenciálnych začiatkov.
 
 \begin{figure}
@@ -105,13 +104,13 @@ CR-indexu a nášho riešenia na čítaniach baktérie E.coli pri rôznom pokryt
 \section{Porovnanie s CR-indexom}
 
 Ako posledné si ukážeme porovnanie nášho riešenia s CR-indexom na obr. \ref{chart:srcr}.
-Z čítaní z baktérie E.coli sme náhodne povyberali podmnožiny s daným pokrytím. Pri každom
+Z čítaní z baktérie \emph{E.coli} sme náhodne povyberali podmnožiny s daným pokrytím. Pri každom
 pokrytí používalo naše riešenie o trochu menej pamäte, napriek tomu bolo o viac než $200\mu s$
 rýchlejšie. Tento výsledok však pripisujeme tomu, že sme zvolili vysoké $k$, keďže naša
-štruktúra si vie lepšie poradiť s väčším $k$, zatiaľčo CR-index si vie lepšie poradiť s menším
+štruktúra si vie lepšie poradiť s väčším $k$, zatiaľ čo CR-index si vie lepšie poradiť s menším
 $k$.
 
 Podobne sme otestovali oba programy na čítaniach z ľudského chromozómu 14. CR-index na týchto čítaniach
-potreboval $1.2GB$ pamäte, zatiaľčo naša štruktúra potrebovala až vyše $2.1GB$. Z časového hľadiska
-to vyšlo naopak, CR-index potreboval okolo $21ms$ na spracovanie dotazu, zatiaľčo naša štruktúra
+potreboval $1.2GB$ pamäte, naša štruktúra potrebovala až vyše $2.1GB$. Z časového hľadiska
+to vyšlo naopak, CR-index potreboval okolo $21ms$ na spracovanie dotazu, naša štruktúra
 to zvládla v priemere za $9ms$.
